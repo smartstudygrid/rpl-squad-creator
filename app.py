@@ -217,7 +217,7 @@ elif st.session_state.page == 'squad':
 
     m_col, c_col = st.columns([3, 1])
 
-    with m_col:
+with m_col:
 
     m_col, c_col = st.columns([3, 1])
 
