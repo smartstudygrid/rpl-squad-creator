@@ -5,9 +5,13 @@ import io
 from PIL import Image
 
 # --- 1. DATABASE CONNECTION ---
-url = st.secrets["SUPABASE_URL"]
-key = st.secrets["SUPABASE_KEY"]
-supabase: Client = create_client(url, key)
+try:
+    url = st.secrets["SUPABASE_URL"]
+    key = st.secrets["SUPABASE_KEY"]
+    supabase: Client = create_client(url, key)
+except Exception as e:
+    st.error("Connection Error: Check your Streamlit Secrets.")
+    st.stop()
 
 # --- 2. PAGE CONFIG ---
 st.set_page_config(page_title="Riyadh Premier League", layout="wide")
@@ -26,10 +30,10 @@ st.markdown(f"""
         text-align: center; 
         width: 100%; 
         font-weight: bold; 
-        font-size: 36px; 
+        font-size: 38px; 
         color: white; 
         padding-top: 20px;
-        text-shadow: 2px 2px 4px #000;
+        text-shadow: 3px 3px 6px #000;
         font-family: 'Arial Black', sans-serif;
     }}
     
@@ -51,13 +55,13 @@ st.markdown(f"""
         color: black !important; 
         font-weight: bold !important; 
         font-size: 16px !important;
-        background: #facc15 !important; /* Solid Yellow for Visibility */
+        background: #facc15 !important; 
         padding: 5px 15px;
         border-radius: 20px;
         border: 2px solid #854d0e;
     }}
     
-    .squad-container {{ margin-top: -20px; }} /* Moved up to look better */
+    .squad-container {{ margin-top: -20px; }}
     
     /* Logo: CIRCLE */
     .logo-circle {{
@@ -81,7 +85,7 @@ st.markdown(f"""
     
     .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
-    /* Upload Icon - Matched to Yellow */
+    /* Small Square Upload Icon - Yellow Theme */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
@@ -94,7 +98,7 @@ st.markdown(f"""
     }}
     .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #000; font-weight: bold; }}
     
-    /* CAPTAIN BADGE: Consolidated into one capsule */
+    /* CAPTAIN BADGE */
     .captain-badge {{
         border: 4px solid #facc15;
         padding: 8px 20px;
@@ -118,6 +122,7 @@ st.markdown(f"""
     <div class="footer-left">www.smartstudygrid.com</div>
 """, unsafe_allow_html=True)
 
+# --- 4. IMAGE PROCESSING ---
 def img_to_base64(image_file):
     if image_file is None: return None
     img = Image.open(image_file).convert("RGB")
@@ -126,39 +131,49 @@ def img_to_base64(image_file):
     img.save(buffered, format="JPEG")
     return base64.b64encode(buffered.getvalue()).decode()
 
+# --- 5. APP STATE ---
 if 'page' not in st.session_state: st.session_state.page = 'home'
 if 'team' not in st.session_state: st.session_state.team = None
 
-# --- LOGIN SCREEN ---
+# --- NAVIGATION: LOGIN SCREEN ---
 if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-        # Visual Appeal: Dark semi-transparent card without the redundant black rectangle
         st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px; border: 1px solid #facc15; text-align:center;'>", unsafe_allow_html=True)
         st.write("### 🏆 Create Your Squad")
         t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Enter Password", type="password")
         if st.button("Enter Dashboard", use_container_width=True):
-            # Passwords check here
-            st.session_state.page = 'squad'; st.session_state.team = t; st.rerun()
+            st.session_state.page = 'squad'
+            st.session_state.team = t
+            st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SQUAD SCREEN ---
+# --- NAVIGATION: SQUAD SCREEN ---
 elif st.session_state.page == 'squad':
     team = st.session_state.team
     st.markdown('<div class="squad-container"></div>', unsafe_allow_html=True)
     
+    # SAFE DATA FETCH (Prevents IndexError)
     res = supabase.table("squads").select("*").eq("team_name", team).execute()
+    
+    if not res.data:
+        st.error(f"Team '{team}' not found in database. Check spelling or SQL setup.")
+        if st.button("Back to Login"): 
+            st.session_state.page = 'home'
+            st.rerun()
+        st.stop()
+
     db_data = res.data[0]
-    is_locked = db_data['is_locked']
+    is_locked = db_data.get('is_locked', False)
     names = db_data.get('player_list', [""]*17)
     pics = db_data.get('squad_pics', {}) 
     cap_name = db_data.get('captain_name', "Captain")
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
 
-    # Upper Branding Area (Shifted Up)
+    # Upper Branding Area
     col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
     
     with col_logo:
@@ -197,7 +212,6 @@ elif st.session_state.page == 'squad':
 
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
-        # Redundant rectangle removed; star and text placed in gold badge
         st.markdown(f'<div class="captain-badge">⭐ CAPTAIN</div>', unsafe_allow_html=True)
         
         if cap_pic:
@@ -212,9 +226,18 @@ elif st.session_state.page == 'squad':
             up_c = st.file_uploader("uc", key="uc", label_visibility="collapsed")
             if up_c: cap_pic = img_to_base64(up_c)
         st.markdown('</div>', unsafe_allow_html=True)
+        
+        if st.button("🚪 Logout", use_container_width=True):
+            st.session_state.page = 'home'
+            st.rerun()
 
     if edit_mode:
+        st.write("---")
         if st.button("💾 SAVE ALL CHANGES", type="primary", use_container_width=True):
+            # Save Team Logo if updated
+            if 'logo_up' in st.session_state and st.session_state.logo_up:
+                team_logo = img_to_base64(st.session_state.logo_up)
+            
             supabase.table("squads").update({
                 "captain_name": cap_name,
                 "player_list": names,
@@ -222,4 +245,5 @@ elif st.session_state.page == 'squad':
                 "cap_pic": cap_pic,
                 "team_logo": team_logo
             }).eq("team_name", team).execute()
-            st.success("Squad Saved Successfully!"); st.rerun()
+            st.success("Squad Saved Successfully!")
+            st.rerun()
