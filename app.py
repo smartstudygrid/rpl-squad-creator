@@ -226,9 +226,7 @@ elif st.session_state.page == 'squad':
             if up_c: cap_pic = img_to_base64(up_c)
         st.markdown('</div>', unsafe_allow_html=True)
         
-        if st.button("🚪 Logout", use_container_width=True):
-            st.session_state.page = 'home'
-            st.rerun()
+        
 
     if edit_mode:
         st.write("---")
