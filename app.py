@@ -12,26 +12,57 @@ supabase: Client = create_client(url, key)
 # --- 2. PAGE CONFIG ---
 st.set_page_config(page_title="Riyadh Premier League", layout="wide")
 
-# --- 3. CUSTOM CSS ---
+# --- 3. CUSTOM CSS (PREMIUM THEME) ---
 st.markdown(f"""
     <style>
+    /* Professional Stadium Backdrop */
     .stApp {{
         background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
                     url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070');
         background-size: cover;
     }}
     
-    /* Global Text Colors */
+    /* Global Text & Branding */
     .header-left {{ position: absolute; top: 10px; left: 20px; font-weight: bold; font-size: 26px; color: white; }}
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 14px; color: #ddd; }}
     .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 12px; color: white; }}
     
-    /* White Text for Captain and Toggle */
-    h3, .stWidgetLabel p {{ color: white !important; font-weight: bold !important; opacity: 1 !important; }}
+    /* Team Name: Arial Black Bold */
+    .team-title {{
+        color: white !important;
+        font-family: "Arial Black", Gadget, sans-serif !important;
+        font-weight: 900 !important;
+        font-size: 42px !important;
+        text-transform: uppercase;
+        margin: 0;
+    }}
+    
+    /* HIGH VISIBILITY TOGGLE */
+    .stWidgetLabel p {{ 
+        color: white !important; 
+        font-weight: bold !important; 
+        font-size: 16px !important;
+        background: rgba(163, 230, 53, 0.2);
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #a3e635;
+    }}
     
     .squad-container {{ margin-top: 100px; }}
     
-    /* Logo & Photo Boxes */
+    /* Logo: CIRCLE & BIGGER */
+    .logo-circle {{
+        width: 100px; height: 100px; 
+        background: rgba(255,255,255,0.2); 
+        border: 3px solid #a3e635;
+        border-radius: 50%; 
+        overflow: hidden; 
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0px 0px 15px rgba(163, 230, 53, 0.5);
+    }}
+    .logo-circle img {{ width: 100%; height: 100%; object-fit: cover; }}
+    
+    /* SQUARE Player Boxes */
     .img-box {{
         width: 110px; height: 110px; background: rgba(255,255,255,0.1); border: 2px solid #a3e635;
         border-radius: 4px; margin: 0 auto 5px auto; overflow: hidden;
@@ -39,15 +70,9 @@ st.markdown(f"""
     }}
     .img-box img {{ width: 100%; height: 100%; object-fit: cover; }}
     
-    .logo-box {{
-        width: 60px; height: 60px; background: rgba(255,255,255,0.2); border: 1px solid white;
-        border-radius: 4px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 15px;
-    }}
-    .logo-box img {{ width: 100%; height: 100%; object-fit: contain; }}
-    
     .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
-    /* Professional Upload Icon */
+    /* Small Professional Square Upload Icon */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
@@ -55,14 +80,14 @@ st.markdown(f"""
     .stFileUploader section > div {{ display: none; }} 
     .stFileUploader button {{
         font-size: 0 !important; width: 32px !important; height: 32px !important;
-        background-color: #a3e635 !important; border-radius: 6px !important;
+        background-color: #a3e635 !important; border-radius: 4px !important;
         border: 1px solid #064e3b !important; margin: 2px auto !important;
-        box-shadow: 0px 2px 4px rgba(0,0,0,0.3); transition: 0.3s;
     }}
-    .stFileUploader button:hover {{ transform: scale(1.1); background-color: #bef264 !important; }}
     .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #064e3b; font-weight: bold; }}
     
+    /* Captain Section Fix */
     .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
+    h3 {{ color: white !important; font-weight: bold !important; margin-bottom: 10px !important; }}
     </style>
     
     <div class="header-left">Riyadh Premier League</div>
@@ -106,22 +131,23 @@ elif st.session_state.page == 'squad':
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
 
-    # Header Layout
-    col_logo, col_title, col_edit, col_logout = st.columns([0.5, 2.5, 1, 1])
+    # HEADER BAR: CIRCLE LOGO & ARIAL BLACK TITLE
+    col_logo, col_title, col_edit, col_logout = st.columns([0.8, 3.2, 1, 1])
     
     with col_logo:
         if team_logo:
-            st.markdown(f'<div class="logo-box"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
         else:
-            st.markdown('<div class="logo-box"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="logo-circle"></div>', unsafe_allow_html=True)
 
     with col_title:
-        st.title(f"{team}")
+        st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
         
     edit_mode = col_edit.toggle("EDIT MODE", value=False, disabled=is_locked)
-    if col_logout.button("Logout"): st.session_state.page = 'home'; st.rerun()
+    if col_logout.button("Logout", use_container_width=True): st.session_state.page = 'home'; st.rerun()
 
     if edit_mode:
+        st.write("---")
         st.info("Upload Team Logo:")
         logo_up = st.file_uploader("logo", key="logo_up", label_visibility="collapsed")
         if logo_up: team_logo = img_to_base64(logo_up)
@@ -174,4 +200,4 @@ elif st.session_state.page == 'squad':
                 "cap_pic": cap_pic,
                 "team_logo": team_logo
             }).eq("team_name", team).execute()
-            st.success("Squad, Photos, and Logo Saved!"); st.rerun()
+            st.success("All Data & Images Saved!"); st.rerun()
