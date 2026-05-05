@@ -123,7 +123,7 @@ if st.session_state.page == 'home':
     with c2:
     
        
-st.markdown("<h5 style='color: white;'>Riyadh Premier League</h5>", unsafe_allow_html=True)        
+st.write("##### Riyadh Premier League")        
 t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Enter Password", type="password")
         if st.button("Enter Dashboard", use_container_width=True):
