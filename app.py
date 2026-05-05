@@ -185,7 +185,7 @@ elif st.session_state.page == 'squad':
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
         
     with col_edit:
-        if st.button("🏠 Home", use_container_width=True):
+        if st.button("🏠", use_container_width=True):
             st.session_state.page = 'home'
             st.rerun()
         
