@@ -24,6 +24,8 @@ st.markdown(f"""
                     url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070');
         background-size: cover;
     }}
+    
+    /* White Visibility for Toggle and Labels */
     .stWidgetLabel p {{
         color: white !important;
         font-weight: bold !important;
@@ -35,7 +37,8 @@ st.markdown(f"""
     div[data-testid="stWidgetLabel"] {{
         color: white !important;
     }}
-        /* Top Center League Title */
+
+    /* Top Center League Title */
     .header-center {{ 
         text-align: center; 
         width: 100%; 
@@ -61,11 +64,8 @@ st.markdown(f"""
     }}
     
     /* YELLOW THEME TOGGLE */
-    .stWidgetLabel p {{ 
-        color: white !important; 
-        font-weight: white !important; 
-        font-size: 16px !important;
-        background: #facc15 !important; 
+    [data-testid="stCheckbox"] {{
+        background: #facc15 !important;
         padding: 5px 15px;
         border-radius: 20px;
         border: 2px solid #854d0e;
@@ -118,13 +118,14 @@ st.markdown(f"""
         font-weight: bold;
         font-size: 20px;
         display: inline-flex;
-        align-items: right;
-        justify-content: right;
+        align-items: center;
+        justify-content: center;
         gap: 10px;
         margin-bottom: 10px;
     }}
     
-
+    .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
+    </style>
     
     <div class="header-center">Riyadh Premier League</div>
     <div class="header-right">Created by: Amanullah Khan</div>
@@ -149,26 +150,23 @@ if st.session_state.page == 'home':
     st.write("## Riyadh Premier League")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-        
-        st.write("###  Create your squad")
+        st.write("### Create your squad")
         t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Enter Password", type="password")
         if st.button("Enter Dashboard", use_container_width=True):
             st.session_state.page = 'squad'
             st.session_state.team = t
             st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # --- NAVIGATION: SQUAD SCREEN ---
 elif st.session_state.page == 'squad':
     team = st.session_state.team
     st.markdown('<div class="squad-container"></div>', unsafe_allow_html=True)
     
-    # SAFE DATA FETCH (Prevents IndexError)
     res = supabase.table("squads").select("*").eq("team_name", team).execute()
     
     if not res.data:
-        st.error(f"Team '{team}' not found in database. Check spelling or SQL setup.")
+        st.error(f"Team '{team}' not found in database.")
         if st.button("Back to Login"): 
             st.session_state.page = 'home'
             st.rerun()
@@ -190,6 +188,12 @@ elif st.session_state.page == 'squad':
             st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="logo-circle"></div>', unsafe_allow_html=True)
+        
+        # LOGO UPLOAD ADDED HERE
+        if 'edit_mode_active' in st.session_state and st.session_state.edit_mode_active:
+            logo_up = st.file_uploader("L", key="logo_up_input", label_visibility="collapsed")
+            if logo_up:
+                team_logo = img_to_base64(logo_up)
     
     with col_title:
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
@@ -200,6 +204,7 @@ elif st.session_state.page == 'squad':
             st.rerun()
         
         edit_mode = st.toggle("EDIT MODE", value=False, disabled=is_locked)
+        st.session_state.edit_mode_active = edit_mode
 
     m_col, c_col = st.columns([3, 1])
 
@@ -240,16 +245,10 @@ elif st.session_state.page == 'squad':
             up_c = st.file_uploader("uc", key="uc", label_visibility="collapsed")
             if up_c: cap_pic = img_to_base64(up_c)
         st.markdown('</div>', unsafe_allow_html=True)
-        
-        
 
     if edit_mode:
         st.write("---")
         if st.button("💾 SAVE ALL CHANGES", type="primary", use_container_width=True):
-            # Save Team Logo if updated
-            if 'logo_up' in st.session_state and st.session_state.logo_up:
-                team_logo = img_to_base64(st.session_state.logo_up)
-            
             supabase.table("squads").update({
                 "captain_name": cap_name,
                 "player_list": names,
