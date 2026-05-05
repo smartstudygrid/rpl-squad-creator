@@ -61,7 +61,7 @@ st.markdown(f"""
         border: 2px solid #854d0e;
     }}
     
-    .squad-container {{ margin-top: -10px; }}
+    .squad-container {{ margin-top: -50px; }}
     
     /* Logo: CIRCLE */
     .logo-circle {{
