@@ -52,8 +52,8 @@ st.markdown(f"""
     
     /* YELLOW THEME TOGGLE */
     .stWidgetLabel p {{ 
-        color: black !important; 
-        font-weight: bold !important; 
+        color: white !important; 
+        font-weight: white !important; 
         font-size: 16px !important;
         background: #facc15 !important; 
         padding: 5px 15px;
@@ -114,8 +114,7 @@ st.markdown(f"""
         margin-bottom: 10px;
     }}
     
-    .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
-    </style>
+
     
     <div class="header-center">Riyadh Premier League</div>
     <div class="header-right">Created by: Amanullah Khan</div>
