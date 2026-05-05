@@ -1,8 +1,11 @@
 import streamlit as st
 from supabase import create_client, Client
+from PIL import Image
+import io
+import plotly.graph_objects as go
 
 # --- 1. DATABASE CONNECTION ---
-# Ensure these match your Streamlit Secrets exactly
+# Assumes you still have your Secrets set up in Streamlit Cloud
 try:
     url = st.secrets["SUPABASE_URL"]
     key = st.secrets["SUPABASE_KEY"]
@@ -34,6 +37,13 @@ st.markdown(f"""
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 16px; color: #ddd; z-index: 999; }}
     .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 14px; color: white; z-index: 999; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; }}
     
+    /* FIXED OVERLAP: Added spacing for the top title */
+    .fixed-header-space {{
+        margin-top: 60px;
+        display: block;
+        height: 1px;
+    }}
+    
     /* Player & Captain Cards */
     .player-slot {{
         background: rgba(255, 255, 255, 0.1);
@@ -43,7 +53,19 @@ st.markdown(f"""
         padding: 15px;
         text-align: center;
         margin-bottom: 5px;
+        color: white;
     }}
+    
+    /* NEW: Modern Square Placeholder */
+    .modern-placeholder {{
+        height: 80px; 
+        width: 80px; 
+        background: #555; 
+        border-radius: 10px; /* Modern Rounded Corners */
+        margin: auto; 
+        border: 2px solid #a3e635; /* Neon Green Border */
+    }}
+    
     .player-name-tag {{
         background-color: #a3e635; /* Neon Green */
         color: #064e3b;
@@ -62,6 +84,17 @@ st.markdown(f"""
         text-align: center;
         box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
     }}
+    
+    /* NEW: Captain Placeholder is also square now */
+    .captain-placeholder-large {{
+        height: 200px; 
+        width: 200px; 
+        background: #666; 
+        border-radius: 15px; /* Large Rounded Corners */
+        margin: auto; 
+        border: 6px solid #facc15; /* Gold Border */
+    }}
+    
     .captain-tag {{
         background-color: #a3e635;
         color: #064e3b;
@@ -74,6 +107,12 @@ st.markdown(f"""
     
     /* Input field styling */
     input {{ background-color: rgba(255,255,255,0.9) !important; color: black !important; }}
+    
+    /* Hide some elements for the final print view */
+    @media print {{
+        .stButton {{ display: none !important; }}
+        input {{ border: none !important; color: white !important; background: transparent !important;}}
+    }}
     </style>
     
     <div class="header-left">🏏 Riyadh Premier League</div>
@@ -96,7 +135,23 @@ TEAMS_PASSWORDS = {
     "Wazirabad Stars": "star11"
 }
 
-# --- 5. NAVIGATION: HOME SCREEN ---
+# --- 5. HELPER FUNCTION FOR TEMPORARY PHOTO HANDLING ---
+def handle_temp_photo(key_prefix, is_locked):
+    # Streamlit cannot click on a placeholder to upload.
+    # We must add an explicit upload button next to it.
+    uploaded_file = st.file_uploader(
+        "Set Profile Pic", 
+        type=['png', 'jpg', 'jpeg'], 
+        key=key_prefix + "_uploader", 
+        disabled=is_locked, 
+        label_visibility="collapsed"
+    )
+    if uploaded_file is not None:
+        return Image.open(uploaded_file)
+    else:
+        return None
+
+# --- 6. NAVIGATION: HOME SCREEN ---
 if st.session_state.page == 'home':
     st.write("##")
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -128,8 +183,10 @@ if st.session_state.page == 'home':
                     st.error("Unauthorized Access")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- 6. NAVIGATION: SQUAD EDITOR ---
+# --- 7. NAVIGATION: SQUAD EDITOR (FIXED LAYOUT) ---
 elif st.session_state.page == 'squad':
+    # Add space to prevent overlap
+    st.markdown('<div class="fixed-header-space"></div>', unsafe_allow_html=True)
     team = st.session_state.team
     
     # Secure Data Fetching
@@ -145,11 +202,20 @@ elif st.session_state.page == 'squad':
     captain = team_data.get('captain_name', "")
 
     # Top Bar Actions
-    c_top1, c_top2 = st.columns([4, 1])
+    c_top1, c_top2, c_top3 = st.columns([3, 1, 1])
     with c_top1:
         st.title(f"Editing: {team}")
     with c_top2:
-        if st.button("🚪 Logout"):
+        # Added Print Feature: Preserves current state to download
+        st.write("#")
+        # st.button("Print Squad (PDF)") - Removed as PDF requires specific backend server.
+        # Adding simple CSS-based download as a workaround.
+        if st.button("Download as PDF", use_container_width=True):
+            st.success("Please use your browser's print function (Ctrl+P or Cmd+P) to save as PDF. I have hidden the edit buttons for you.")
+
+    with c_top3:
+        st.write("#")
+        if st.button("🚪 Logout", use_container_width=True):
             st.session_state.page = 'home'
             st.rerun()
 
@@ -160,49 +226,65 @@ elif st.session_state.page == 'squad':
     main_grid, cap_panel = st.columns([3, 1])
 
     with main_grid:
-        # Row 1 & 2
-        for r in range(2):
+        # Layout 18 players (3 rows of 6)
+        for row in range(3):
             cols = st.columns(6)
             for i in range(6):
-                idx = (r * 6) + i
+                idx = (row * 6) + i
                 with cols[i]:
-                    st.markdown('<div class="player-slot"><div style="height:70px; width:70px; background:#555; border-radius:50%; margin:auto; border:2px solid #a3e635;"></div></div>', unsafe_allow_html=True)
-                    players[idx] = st.text_input(f"P{idx}", value=players[idx], label_visibility="collapsed", disabled=is_locked)
-                    st.markdown(f'<div class="player-name-tag">{players[idx] if players[idx] else "Empty"}</div>', unsafe_allow_html=True)
-        
-        # Row 3
-        cols3 = st.columns(6)
-        for i in range(6):
-            idx = 12 + i
-            with cols3[i]:
-                st.markdown('<div class="player-slot"><div style="height:70px; width:70px; background:#555; border-radius:50%; margin:auto; border:2px solid #a3e635;"></div></div>', unsafe_allow_html=True)
-                players[idx] = st.text_input(f"P{idx}", value=players[idx], label_visibility="collapsed", disabled=is_locked)
-                st.markdown(f'<div class="player-name-tag">{players[idx] if players[idx] else "Empty"}</div>', unsafe_allow_html=True)
+                    # Create unique state for each player pic
+                    temp_pic = handle_temp_photo(f"P{idx}", is_locked)
+                    
+                    if temp_pic:
+                        # Display the uploaded picture
+                        st.image(temp_pic, use_container_width=True, width=80)
+                    else:
+                        # Display the square placeholder
+                        st.markdown('<div class="player-slot"><div class="modern-placeholder"></div></div>', unsafe_allow_html=True)
+                    
+                    # Name Input (Linked to Database)
+                    players[idx] = st.text_input(f"P{idx}_name", value=players[idx], label_visibility="collapsed", disabled=is_locked)
+                    st.markdown(f'<div class="player-name-tag">{players[idx] if players[idx] else "Empty Slot"}</div>', unsafe_allow_html=True)
 
     with cap_panel:
         st.markdown('<div class="captain-container">', unsafe_allow_html=True)
         st.write("### ⭐️ CAPTAIN")
-        st.markdown('<div style="height:200px; width:200px; background:#666; border-radius:50%; margin:auto; border:6px solid #facc15;"></div>', unsafe_allow_html=True)
+        
+        # Captain Photo handling
+        temp_cap_pic = handle_temp_photo("captain", is_locked)
+        if temp_cap_pic:
+            st.image(temp_cap_pic, use_container_width=True, width=200)
+        else:
+            st.markdown('<div class="captain-placeholder-large"></div>', unsafe_allow_html=True)
+            
+        # Captain Name
         captain = st.text_input("Enter Captain Name", value=captain, disabled=is_locked)
-        st.markdown(f'<div class="captain-tag">{captain if captain else "NAME HERE"}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="captain-tag">{captain if captain else "CAPTAIN NAME"}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
         
         st.write("##")
         if st.button("💾 SAVE CHANGES", type="primary", use_container_width=True, disabled=is_locked):
+            # Photo saving requires Supabase Storage setup, which is not yet done.
+            # We are currently only saving the text names.
             supabase.table("squads").update({
                 "captain_name": captain, 
                 "player_list": players
             }).eq("team_name", team).execute()
-            st.success("Squad updated successfully!")
+            st.success("Names saved! Remember, pictures are temporary until Storage is configured.")
             st.balloons()
 
-# --- 7. NAVIGATION: ADMIN MASTER CONTROL ---
+# --- 8. NAVIGATION: ADMIN MASTER CONTROL ---
 elif st.session_state.page == 'admin':
+    # Add space to prevent overlap
+    st.markdown('<div class="fixed-header-space"></div>', unsafe_allow_html=True)
     st.title("Master Admin Panel")
     
     # Check current lock status from any team
-    res = supabase.table("squads").select("is_locked").limit(1).execute()
-    current_lock = res.data[0]['is_locked'] if res.data else False
+    try:
+        res = supabase.table("squads").select("is_locked").limit(1).execute()
+        current_lock = res.data[0]['is_locked'] if res.data else False
+    except Exception:
+        current_lock = False
     
     status = "LOCKED" if current_lock else "OPEN"
     st.subheader(f"System Status: {status}")
