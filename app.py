@@ -14,7 +14,7 @@ except Exception as e:
     st.stop()
 
 # --- 2. PAGE CONFIG ---
-st.set_page_config(page_title="Riyadh Premier League", layout="wide")
+st.set_page_config(page_title="Amanullah Khan", layout="wide")
 
 # --- 3. CUSTOM CSS ---
 st.markdown(f"""
