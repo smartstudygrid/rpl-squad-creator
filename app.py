@@ -48,7 +48,7 @@ st.markdown(f"""
     
     /* YELLOW THEME TOGGLE */
     .stWidgetLabel p {{ 
-        color: black !important; 
+        color: white !important; 
         font-weight: bold !important; 
         font-size: 16px !important;
         background: #facc15 !important; /* Solid Yellow for Visibility */
