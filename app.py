@@ -108,7 +108,7 @@ st.markdown(f"""
         font-weight: bold;
         font-size: 20px;
         display: inline-flex;
-        align-items: center;
+        align-items: right;
         justify-content: center;
         gap: 10px;
         margin-bottom: 10px;
