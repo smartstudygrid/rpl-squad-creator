@@ -24,24 +24,8 @@ st.markdown(f"""
                     url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070');
         background-size: cover;
     }}
-    .stWidgetLabel p {{ 
-        color: white !important; 
-        font-weight: bold !important; 
-        font-size: 16px !important;
-        text-shadow: 1px 1px 2px black;
-    }}
     
-    div[data-testid="stWidgetLabel"] {{
-        color: white !important;
-    }}
-    /* ------------------------------ */
-
-    .team-title {{
-        ...
-    }}
-    </style>
-""", unsafe_allow_html=True)
-    /* Top Center League Title */
+        /* Top Center League Title */
     .header-center {{ 
         text-align: center; 
         width: 100%; 
