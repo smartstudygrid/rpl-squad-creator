@@ -123,8 +123,6 @@ if st.session_state.page == 'home':
     with c2:
     
        
-        st.set_page_config(page_title="Riyadh Premier League", layout="wide")
-        st.write(page_title="Create Your Squad")
         st.write("### 🏆 Create Your Squad")
         t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Enter Password", type="password")
