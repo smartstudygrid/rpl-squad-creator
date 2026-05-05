@@ -21,15 +21,16 @@ st.markdown(f"""
         background-size: cover;
     }}
     
-    /* Center Title at Top */
+    /* Top Center League Title */
     .header-center {{ 
         text-align: center; 
         width: 100%; 
         font-weight: bold; 
-        font-size: 32px; 
+        font-size: 36px; 
         color: white; 
-        padding-top: 10px;
+        padding-top: 20px;
         text-shadow: 2px 2px 4px #000;
+        font-family: 'Arial Black', sans-serif;
     }}
     
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 14px; color: #ddd; }}
@@ -47,17 +48,16 @@ st.markdown(f"""
     
     /* YELLOW THEME TOGGLE */
     .stWidgetLabel p {{ 
-        color: white !important; 
+        color: black !important; 
         font-weight: bold !important; 
         font-size: 16px !important;
-        background: rgba(250, 215, 0, 0.3); /* Yellow Tint */
-        padding: 5px 10px;
-        border-radius: 5px;
-        border: 1px solid #facc15; /* Yellow Border */
+        background: #facc15 !important; /* Solid Yellow for Visibility */
+        padding: 5px 15px;
+        border-radius: 20px;
+        border: 2px solid #854d0e;
     }}
     
-    /* Shifted Squad Container slightly up */
-    .squad-container {{ margin-top: 40px; }}
+    .squad-container {{ margin-top: -20px; }} /* Moved up to look better */
     
     /* Logo: CIRCLE */
     .logo-circle {{
@@ -81,7 +81,7 @@ st.markdown(f"""
     
     .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
-    /* Upload Icon */
+    /* Upload Icon - Matched to Yellow */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
@@ -94,20 +94,20 @@ st.markdown(f"""
     }}
     .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #000; font-weight: bold; }}
     
-    /* CAPTAIN BOX: Star and Text Inside Rectangle */
+    /* CAPTAIN BADGE: Consolidated into one capsule */
     .captain-badge {{
         border: 4px solid #facc15;
-        padding: 10px;
-        border-radius: 30px; /* Capsule shape */
-        background: rgba(0,0,0,0.5);
+        padding: 8px 20px;
+        border-radius: 25px; 
+        background: rgba(0,0,0,0.8);
         color: white;
         font-weight: bold;
-        font-size: 22px;
-        display: flex;
+        font-size: 20px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }}
     
     .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
@@ -129,18 +129,22 @@ def img_to_base64(image_file):
 if 'page' not in st.session_state: st.session_state.page = 'home'
 if 'team' not in st.session_state: st.session_state.team = None
 
+# --- LOGIN SCREEN ---
 if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-        st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px;'>", unsafe_allow_html=True)
-        st.title("🏆 RPL Login")
-        t = st.selectbox("Select Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
-        p = st.text_input("Password", type="password")
-        if st.button("Access Squad", use_container_width=True):
+        # Visual Appeal: Dark semi-transparent card without the redundant black rectangle
+        st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px; border: 1px solid #facc15; text-align:center;'>", unsafe_allow_html=True)
+        st.write("### 🏆 Create Your Squad")
+        t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
+        p = st.text_input("Enter Password", type="password")
+        if st.button("Enter Dashboard", use_container_width=True):
+            # Passwords check here
             st.session_state.page = 'squad'; st.session_state.team = t; st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
+# --- SQUAD SCREEN ---
 elif st.session_state.page == 'squad':
     team = st.session_state.team
     st.markdown('<div class="squad-container"></div>', unsafe_allow_html=True)
@@ -154,7 +158,7 @@ elif st.session_state.page == 'squad':
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
 
-    # Move branding just a little up
+    # Upper Branding Area (Shifted Up)
     col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
     
     with col_logo:
@@ -193,7 +197,7 @@ elif st.session_state.page == 'squad':
 
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
-        # Move Star and CAPTAIN text inside a gold badge/rectangle
+        # Redundant rectangle removed; star and text placed in gold badge
         st.markdown(f'<div class="captain-badge">⭐ CAPTAIN</div>', unsafe_allow_html=True)
         
         if cap_pic:
@@ -218,4 +222,4 @@ elif st.session_state.page == 'squad':
                 "cap_pic": cap_pic,
                 "team_logo": team_logo
             }).eq("team_name", team).execute()
-            st.success("Changes saved!"); st.rerun()
+            st.success("Squad Saved Successfully!"); st.rerun()
