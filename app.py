@@ -12,22 +12,30 @@ supabase: Client = create_client(url, key)
 # --- 2. PAGE CONFIG ---
 st.set_page_config(page_title="Riyadh Premier League", layout="wide")
 
-# --- 3. CUSTOM CSS (PREMIUM THEME) ---
+# --- 3. CUSTOM CSS ---
 st.markdown(f"""
     <style>
-    /* Professional Stadium Backdrop */
     .stApp {{
         background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
                     url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=2070');
         background-size: cover;
     }}
     
-    /* Global Text & Branding */
-    .header-left {{ position: absolute; top: 10px; left: 20px; font-weight: bold; font-size: 26px; color: white; }}
+    /* Center Title at Top */
+    .header-center {{ 
+        text-align: center; 
+        width: 100%; 
+        font-weight: bold; 
+        font-size: 32px; 
+        color: white; 
+        padding-top: 10px;
+        text-shadow: 2px 2px 4px #000;
+    }}
+    
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 14px; color: #ddd; }}
     .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 12px; color: white; }}
     
-    /* Team Name: Arial Black Bold */
+    /* Team Name Style */
     .team-title {{
         color: white !important;
         font-family: "Arial Black", Gadget, sans-serif !important;
@@ -37,28 +45,29 @@ st.markdown(f"""
         margin: 0;
     }}
     
-    /* HIGH VISIBILITY TOGGLE */
+    /* YELLOW THEME TOGGLE */
     .stWidgetLabel p {{ 
         color: white !important; 
         font-weight: bold !important; 
         font-size: 16px !important;
-        background: rgba(163, 230, 53, 0.2);
+        background: rgba(250, 215, 0, 0.3); /* Yellow Tint */
         padding: 5px 10px;
         border-radius: 5px;
-        border: 1px solid #a3e635;
+        border: 1px solid #facc15; /* Yellow Border */
     }}
     
-    .squad-container {{ margin-top: 100px; }}
+    /* Shifted Squad Container slightly up */
+    .squad-container {{ margin-top: 40px; }}
     
-    /* Logo: CIRCLE & BIGGER */
+    /* Logo: CIRCLE */
     .logo-circle {{
-        width: 100px; height: 100px; 
+        width: 110px; height: 110px; 
         background: rgba(255,255,255,0.2); 
-        border: 3px solid #a3e635;
+        border: 3px solid #facc15;
         border-radius: 50%; 
         overflow: hidden; 
         display: flex; align-items: center; justify-content: center;
-        box-shadow: 0px 0px 15px rgba(163, 230, 53, 0.5);
+        box-shadow: 0px 0px 15px rgba(250, 215, 0, 0.4);
     }}
     .logo-circle img {{ width: 100%; height: 100%; object-fit: cover; }}
     
@@ -72,7 +81,7 @@ st.markdown(f"""
     
     .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
-    /* Small Professional Square Upload Icon */
+    /* Upload Icon */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
@@ -80,17 +89,31 @@ st.markdown(f"""
     .stFileUploader section > div {{ display: none; }} 
     .stFileUploader button {{
         font-size: 0 !important; width: 32px !important; height: 32px !important;
-        background-color: #a3e635 !important; border-radius: 4px !important;
-        border: 1px solid #064e3b !important; margin: 2px auto !important;
+        background-color: #facc15 !important; border-radius: 4px !important;
+        border: 1px solid #854d0e !important; margin: 2px auto !important;
     }}
-    .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #064e3b; font-weight: bold; }}
+    .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #000; font-weight: bold; }}
     
-    /* Captain Section Fix */
+    /* CAPTAIN BOX: Star and Text Inside Rectangle */
+    .captain-badge {{
+        border: 4px solid #facc15;
+        padding: 10px;
+        border-radius: 30px; /* Capsule shape */
+        background: rgba(0,0,0,0.5);
+        color: white;
+        font-weight: bold;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }}
+    
     .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
-    h3 {{ color: white !important; font-weight: bold !important; margin-bottom: 10px !important; }}
     </style>
     
-    <div class="header-left">Riyadh Premier League</div>
+    <div class="header-center">Riyadh Premier League</div>
     <div class="header-right">Created by: Amanullah Khan</div>
     <div class="footer-left">www.smartstudygrid.com</div>
 """, unsafe_allow_html=True)
@@ -131,8 +154,8 @@ elif st.session_state.page == 'squad':
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
 
-    # HEADER BAR: CIRCLE LOGO & ARIAL BLACK TITLE
-    col_logo, col_title, col_edit, col_logout = st.columns([0.8, 3.2, 1, 1])
+    # Move branding just a little up
+    col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
     
     with col_logo:
         if team_logo:
@@ -144,13 +167,6 @@ elif st.session_state.page == 'squad':
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
         
     edit_mode = col_edit.toggle("EDIT MODE", value=False, disabled=is_locked)
-    if col_logout.button("Logout", use_container_width=True): st.session_state.page = 'home'; st.rerun()
-
-    if edit_mode:
-        st.write("---")
-        st.info("Upload Team Logo:")
-        logo_up = st.file_uploader("logo", key="logo_up", label_visibility="collapsed")
-        if logo_up: team_logo = img_to_base64(logo_up)
 
     m_col, c_col = st.columns([3, 1])
 
@@ -177,7 +193,9 @@ elif st.session_state.page == 'squad':
 
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
-        st.write("### ⭐️ CAPTAIN")
+        # Move Star and CAPTAIN text inside a gold badge/rectangle
+        st.markdown(f'<div class="captain-badge">⭐ CAPTAIN</div>', unsafe_allow_html=True)
+        
         if cap_pic:
             st.markdown(f'<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;"><img src="data:image/jpeg;base64,{cap_pic}"></div>', unsafe_allow_html=True)
         else:
@@ -200,4 +218,4 @@ elif st.session_state.page == 'squad':
                 "cap_pic": cap_pic,
                 "team_logo": team_logo
             }).eq("team_name", team).execute()
-            st.success("All Data & Images Saved!"); st.rerun()
+            st.success("Changes saved!"); st.rerun()
