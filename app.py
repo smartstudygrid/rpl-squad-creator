@@ -136,7 +136,7 @@ if 'team' not in st.session_state: st.session_state.team = None
 
 # --- NAVIGATION: LOGIN SCREEN ---
 if st.session_state.page == 'home':
-    st.write("## Riyadh Premier League")
+    st.write("## Created by: Amanullah Khan")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
         
