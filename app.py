@@ -183,6 +183,7 @@ elif st.session_state.page == 'squad':
     team_logo = db_data.get('team_logo', None)
 
     # --- Upper Branding Area ---
+    # --- HEADER SECTION ---
     col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
     
     with col_edit:
@@ -196,7 +197,7 @@ elif st.session_state.page == 'squad':
             st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="logo-circle"></div>', unsafe_allow_html=True)
-        
+        # Upload button for logo
         if edit_mode:
             logo_up = st.file_uploader("L", key="logo_up", label_visibility="collapsed")
             if logo_up:
@@ -205,10 +206,18 @@ elif st.session_state.page == 'squad':
     with col_title:
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
 
+    # --- MAIN CONTENT AREA ---
+    # Make sure this line starts at the far left, aligned with "with col_title"
     m_col, c_col = st.columns([3, 1])
 
     with m_col:
-        # (The rest of your player grid code continues here...)
+        for r in range(3):
+            cols = st.columns(6)
+            # ... (the rest of your code)
+
+    m_col, c_col = st.columns([3, 1])
+
+    with m_col:
 
     m_col, c_col = st.columns([3, 1])
 
