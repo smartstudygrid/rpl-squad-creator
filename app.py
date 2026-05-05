@@ -121,8 +121,7 @@ if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-        # Visual Appeal: Dark semi-transparent card without the redundant black rectangle
-        st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px; border: 1px solid #facc15; text-align:center;'>", unsafe_allow_html=True)
+       
         st.write("### 🏆 Create Your Squad")
         t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Enter Password", type="password")
