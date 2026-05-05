@@ -12,7 +12,7 @@ supabase: Client = create_client(url, key)
 # --- 2. PAGE CONFIG ---
 st.set_page_config(page_title="Riyadh Premier League", layout="wide")
 
-# --- 3. CUSTOM CSS ---
+# --- 3. CUSTOM CSS (VISUAL REFINEMENT) ---
 st.markdown(f"""
     <style>
     .stApp {{
@@ -21,7 +21,7 @@ st.markdown(f"""
         background-size: cover;
     }}
     
-    /* Branding & Toggle Visibility */
+    /* Branding */
     .header-left {{ position: absolute; top: 10px; left: 20px; font-weight: bold; font-size: 26px; color: white; }}
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 14px; color: #ddd; }}
     .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 12px; color: white; }}
@@ -29,9 +29,8 @@ st.markdown(f"""
     /* Force Toggle Text to White */
     .stWidgetLabel p {{ color: white !important; font-weight: bold !important; }}
 
-    /* Layout */
+    /* Layout Spacing */
     .squad-container {{ margin-top: 100px; }}
-    .player-card {{ background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 10px; text-align: center; }}
     
     /* SQUARE Placeholders */
     .img-box {{
@@ -40,18 +39,22 @@ st.markdown(f"""
         display: flex; align-items: center; justify-content: center;
     }}
     .img-box img {{ width: 100%; height: 100%; object-fit: cover; }}
-    .name-tag {{ background: #a3e635; color: #000; font-weight: bold; padding: 3px; border-radius: 2px; font-size: 11px; text-transform: uppercase; }}
+    
+    /* Plain White Text for Names */
+    .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 5px; }}
 
-    /* Transparent Upload "Hyperlink" Style */
+    /* Small Square Upload Icon */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
     }}
+    .stFileUploader section > div {{ display: none; }} 
     .stFileUploader button {{
-        background: transparent !important; color: white !important; border: none !important; 
-        text-decoration: underline !important; font-size: 12px !important; padding: 0 !important;
+        font-size: 0 !important; width: 30px !important; height: 30px !important;
+        background-color: #a3e635 !important; border-radius: 4px !important;
+        border: 1px solid #064e3b !important; margin: 5px auto !important;
     }}
-    .stFileUploader button::before {{ content: "Upload Player Pic"; }}
+    .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #064e3b; }}
     
     .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.3); text-align: center; }}
     </style>
@@ -74,16 +77,18 @@ def img_to_base64(image_file):
 if 'page' not in st.session_state: st.session_state.page = 'home'
 if 'team' not in st.session_state: st.session_state.team = None
 
-# --- HOME ---
+# --- LOGIN SCREEN ---
 if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
+        st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px;'>", unsafe_allow_html=True)
         st.title("🏆 RPL Login")
         t = st.selectbox("Select Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Password", type="password")
         if st.button("Access Squad", use_container_width=True):
             st.session_state.page = 'squad'; st.session_state.team = t; st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # --- SQUAD SCREEN ---
 elif st.session_state.page == 'squad':
@@ -112,12 +117,14 @@ elif st.session_state.page == 'squad':
             for i in range(6):
                 idx = str((r * 6) + i)
                 with cols[int(i)]:
+                    # Display Square Photo
                     p_img = pics.get(idx)
                     st.markdown(f'''<div class="img-box">
                         {f'<img src="data:image/jpeg;base64,{p_img}">' if p_img else ""}
                     </div>''', unsafe_allow_html=True)
                     
-                    st.markdown(f'<div class="name-tag">{names[int(idx)] if names[int(idx)] else "EMPTY"}</div>', unsafe_allow_html=True)
+                    # Plain White Name Label
+                    st.markdown(f'<div class="plain-name">{names[int(idx)] if names[int(idx)] else "EMPTY"}</div>', unsafe_allow_html=True)
                     
                     if edit_mode:
                         names[int(idx)] = st.text_input("n", value=names[int(idx)], key=f"n{idx}", label_visibility="collapsed")
@@ -127,12 +134,13 @@ elif st.session_state.page == 'squad':
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
         st.write("### ⭐️ CAPTAIN")
-        # Removed the extra box: Placeholder/Image appears immediately under the title
+        # Captain Photo
         st.markdown(f'''<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;">
             {f'<img src="data:image/jpeg;base64,{cap_pic}">' if cap_pic else ""}
         </div>''', unsafe_allow_html=True)
         
-        st.markdown(f'<div class="name-tag" style="font-size:18px;">{cap_name}</div>', unsafe_allow_html=True)
+        # Plain White Captain Name
+        st.markdown(f'<div class="plain-name" style="font-size:20px;">{cap_name}</div>', unsafe_allow_html=True)
         
         if edit_mode:
             cap_name = st.text_input("cn", value=cap_name, key="cn", label_visibility="collapsed")
