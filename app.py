@@ -12,7 +12,7 @@ supabase: Client = create_client(url, key)
 # --- 2. PAGE CONFIG ---
 st.set_page_config(page_title="Riyadh Premier League", layout="wide")
 
-# --- 3. CUSTOM CSS (VISUAL REFINEMENT) ---
+# --- 3. CUSTOM CSS ---
 st.markdown(f"""
     <style>
     .stApp {{
@@ -21,27 +21,21 @@ st.markdown(f"""
         background-size: cover;
     }}
     
-    /* Branding */
     .header-left {{ position: absolute; top: 10px; left: 20px; font-weight: bold; font-size: 26px; color: white; }}
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 14px; color: #ddd; }}
     .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 12px; color: white; }}
     
-    /* Force Toggle Text to White */
     .stWidgetLabel p {{ color: white !important; font-weight: bold !important; }}
-
-    /* Layout Spacing */
     .squad-container {{ margin-top: 100px; }}
     
-    /* SQUARE Placeholders */
     .img-box {{
-        width: 100px; height: 100px; background: #333; border: 2px solid #a3e635;
-        border-radius: 6px; margin: 0 auto 5px auto; overflow: hidden;
+        width: 110px; height: 110px; background: #333; border: 2px solid #a3e635;
+        border-radius: 4px; margin: 0 auto 5px auto; overflow: hidden;
         display: flex; align-items: center; justify-content: center;
     }}
     .img-box img {{ width: 100%; height: 100%; object-fit: cover; }}
     
-    /* Plain White Text for Names */
-    .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 5px; }}
+    .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
     /* Small Square Upload Icon */
     .stFileUploader label {{ display: none; }}
@@ -50,11 +44,11 @@ st.markdown(f"""
     }}
     .stFileUploader section > div {{ display: none; }} 
     .stFileUploader button {{
-        font-size: 0 !important; width: 30px !important; height: 30px !important;
+        font-size: 0 !important; width: 28px !important; height: 28px !important;
         background-color: #a3e635 !important; border-radius: 4px !important;
-        border: 1px solid #064e3b !important; margin: 5px auto !important;
+        border: 1px solid #064e3b !important; margin: 2px auto !important;
     }}
-    .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #064e3b; }}
+    .stFileUploader button::before {{ content: "⬆"; font-size: 14px; color: #064e3b; }}
     
     .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.3); text-align: center; }}
     </style>
@@ -64,7 +58,6 @@ st.markdown(f"""
     <div class="footer-left">www.smartstudygrid.com</div>
 """, unsafe_allow_html=True)
 
-# --- 4. IMAGE PROCESSING ---
 def img_to_base64(image_file):
     if image_file is None: return None
     img = Image.open(image_file).convert("RGB")
@@ -73,11 +66,9 @@ def img_to_base64(image_file):
     img.save(buffered, format="JPEG")
     return base64.b64encode(buffered.getvalue()).decode()
 
-# --- 5. NAVIGATION ---
 if 'page' not in st.session_state: st.session_state.page = 'home'
 if 'team' not in st.session_state: st.session_state.team = None
 
-# --- LOGIN SCREEN ---
 if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
@@ -90,56 +81,55 @@ if st.session_state.page == 'home':
             st.session_state.page = 'squad'; st.session_state.team = t; st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SQUAD SCREEN ---
 elif st.session_state.page == 'squad':
     team = st.session_state.team
     st.markdown('<div class="squad-container"></div>', unsafe_allow_html=True)
     
-    # Data Fetch
     res = supabase.table("squads").select("*").eq("team_name", team).execute()
     db_data = res.data[0]
     is_locked = db_data['is_locked']
-    names = db_data.get('player_list', [""]*18)
+    names = db_data.get('player_list', [""]*17) # 17 Players
     pics = db_data.get('squad_pics', {}) 
     cap_name = db_data.get('captain_name', "Captain")
     cap_pic = db_data.get('cap_pic', None)
 
     col_title, col_edit, col_logout = st.columns([3, 1, 1])
-    col_title.title(f"SQUAD: {team}")
+    col_title.title(f"{team}")
     edit_mode = col_edit.toggle("EDIT MODE", value=False, disabled=is_locked)
     if col_logout.button("Logout"): st.session_state.page = 'home'; st.rerun()
 
     m_col, c_col = st.columns([3, 1])
 
     with m_col:
+        # 17 Players Grid
         for r in range(3):
             cols = st.columns(6)
             for i in range(6):
-                idx = str((r * 6) + i)
-                with cols[int(i)]:
-                    # Display Square Photo
-                    p_img = pics.get(idx)
-                    st.markdown(f'''<div class="img-box">
-                        {f'<img src="data:image/jpeg;base64,{p_img}">' if p_img else ""}
-                    </div>''', unsafe_allow_html=True)
-                    
-                    # Plain White Name Label
-                    st.markdown(f'<div class="plain-name">{names[int(idx)] if names[int(idx)] else "EMPTY"}</div>', unsafe_allow_html=True)
-                    
-                    if edit_mode:
-                        names[int(idx)] = st.text_input("n", value=names[int(idx)], key=f"n{idx}", label_visibility="collapsed")
-                        up = st.file_uploader("u", key=f"u{idx}", label_visibility="collapsed")
-                        if up: pics[idx] = img_to_base64(up)
+                idx_num = (r * 6) + i
+                if idx_num < 17: # Only show up to 17 players
+                    idx = str(idx_num)
+                    with cols[i]:
+                        p_img = pics.get(idx)
+                        if p_img:
+                            st.markdown(f'<div class="img-box"><img src="data:image/jpeg;base64,{p_img}"></div>', unsafe_allow_html=True)
+                        else:
+                            st.markdown('<div class="img-box"></div>', unsafe_allow_html=True)
+                        
+                        st.markdown(f'<div class="plain-name">{names[idx_num] if names[idx_num] else "EMPTY"}</div>', unsafe_allow_html=True)
+                        
+                        if edit_mode:
+                            names[idx_num] = st.text_input("n", value=names[idx_num], key=f"n{idx}", label_visibility="collapsed")
+                            up = st.file_uploader("u", key=f"u{idx}", label_visibility="collapsed")
+                            if up: pics[idx] = img_to_base64(up)
 
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
         st.write("### ⭐️ CAPTAIN")
-        # Captain Photo
-        st.markdown(f'''<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;">
-            {f'<img src="data:image/jpeg;base64,{cap_pic}">' if cap_pic else ""}
-        </div>''', unsafe_allow_html=True)
+        if cap_pic:
+            st.markdown(f'<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;"><img src="data:image/jpeg;base64,{cap_pic}"></div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;"></div>', unsafe_allow_html=True)
         
-        # Plain White Captain Name
         st.markdown(f'<div class="plain-name" style="font-size:20px;">{cap_name}</div>', unsafe_allow_html=True)
         
         if edit_mode:
@@ -149,12 +139,11 @@ elif st.session_state.page == 'squad':
         st.markdown('</div>', unsafe_allow_html=True)
 
     if edit_mode:
-        st.write("---")
-        if st.button("💾 SAVE SQUAD PERMANENTLY"):
+        if st.button("💾 SAVE SQUAD & PHOTOS", type="primary", use_container_width=True):
             supabase.table("squads").update({
                 "captain_name": cap_name,
                 "player_list": names,
                 "squad_pics": pics,
                 "cap_pic": cap_pic
             }).eq("team_name", team).execute()
-            st.success("Squad & Photos Saved!"); st.rerun()
+            st.success("Saved Successfully!"); st.rerun()
