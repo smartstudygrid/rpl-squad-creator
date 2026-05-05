@@ -216,10 +216,10 @@ elif st.session_state.page == 'squad':
 
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
-        st.markdown(f'<div class="captain-badge">⭐ CAPTAIN</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="captain-badge"> CAPTAIN</div>', unsafe_allow_html=True)
         
         if cap_pic:
-            st.markdown(f'<div class="img-box" style="width:250px; height:250px; border:4px solid #facc15;"><img src="data:image/jpeg;base64,{cap_pic}"></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="img-box" style="width:270px; height:270px; border:4px solid #facc15;"><img src="data:image/jpeg;base64,{cap_pic}"></div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;"></div>', unsafe_allow_html=True)
         
