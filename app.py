@@ -136,11 +136,11 @@ if 'team' not in st.session_state: st.session_state.team = None
 
 # --- NAVIGATION: LOGIN SCREEN ---
 if st.session_state.page == 'home':
-    st.write("## Squads")
+    st.write("## Riyadh Premier League")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-        st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px; border: 1px solid #facc15; text-align:center;'>", unsafe_allow_html=True)
-        st.write("###  Riyadh Premier League")
+        
+        st.write("###  Create your squad")
         t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
         p = st.text_input("Enter Password", type="password")
         if st.button("Enter Dashboard", use_container_width=True):
