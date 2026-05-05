@@ -212,20 +212,7 @@ elif st.session_state.page == 'squad':
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
         st.markdown(f'<div class="captain-badge">⭐ CAPTAIN</div>', unsafe_allow_html=True)
-        # --- HOME BUTTON WITH SAVE WARNING ---
-        if st.button("🏠 Home", use_container_width=True):
-            st.session_state.confirm_home = True
-
-        if st.session_state.get('confirm_home', False):
-            st.warning("⚠️ Did you save your changes? Unsaved data will be lost.")
-            col_yes, col_no = st.columns(2)
-            if col_yes.button("Yes, Go Home", use_container_width=True):
-                st.session_state.confirm_home = False
-                st.session_state.page = 'home'
-                st.rerun()
-            if col_no.button("Cancel", use_container_width=True):
-                st.session_state.confirm_home = False
-                st.rerun()
+        
         if cap_pic:
             st.markdown(f'<div class="img-box" style="width:180px; height:180px; border:4px solid #facc15;"><img src="data:image/jpeg;base64,{cap_pic}"></div>', unsafe_allow_html=True)
         else:
