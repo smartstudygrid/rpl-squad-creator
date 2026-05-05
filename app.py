@@ -121,10 +121,9 @@ if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-     
-    st.write("##### Riyadh Premier League")        
-    t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
-        p = st.text_input("Enter Password", type="password")
+        st.write("##### Riyadh Premier League")
+        t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
+    p = st.text_input("Enter Password", type="password")
         if st.button("Enter Dashboard", use_container_width=True):
             # Passwords check here
             st.session_state.page = 'squad'; st.session_state.team = t; st.rerun()
