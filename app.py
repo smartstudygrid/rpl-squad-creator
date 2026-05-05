@@ -70,6 +70,8 @@ st.markdown(f"""
         box-shadow: 0px 0px 15px rgba(250, 215, 0, 0.4);
     }}
     .logo-circle img {{ width: 100%; height: 100%; object-fit: cover; }}
+
+
     
     /* SQUARE Player Boxes */
     .img-box {{
