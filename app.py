@@ -21,36 +21,48 @@ st.markdown(f"""
         background-size: cover;
     }}
     
+    /* Global Text Colors */
     .header-left {{ position: absolute; top: 10px; left: 20px; font-weight: bold; font-size: 26px; color: white; }}
     .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 14px; color: #ddd; }}
     .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 12px; color: white; }}
     
-    .stWidgetLabel p {{ color: white !important; font-weight: bold !important; }}
+    /* White Text for Captain and Toggle */
+    h3, .stWidgetLabel p {{ color: white !important; font-weight: bold !important; opacity: 1 !important; }}
+    
     .squad-container {{ margin-top: 100px; }}
     
+    /* Logo & Photo Boxes */
     .img-box {{
-        width: 110px; height: 110px; background: #333; border: 2px solid #a3e635;
+        width: 110px; height: 110px; background: rgba(255,255,255,0.1); border: 2px solid #a3e635;
         border-radius: 4px; margin: 0 auto 5px auto; overflow: hidden;
         display: flex; align-items: center; justify-content: center;
     }}
     .img-box img {{ width: 100%; height: 100%; object-fit: cover; }}
     
+    .logo-box {{
+        width: 60px; height: 60px; background: rgba(255,255,255,0.2); border: 1px solid white;
+        border-radius: 4px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 15px;
+    }}
+    .logo-box img {{ width: 100%; height: 100%; object-fit: contain; }}
+    
     .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
-    /* Small Square Upload Icon */
+    /* Professional Upload Icon */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
     }}
     .stFileUploader section > div {{ display: none; }} 
     .stFileUploader button {{
-        font-size: 0 !important; width: 28px !important; height: 28px !important;
-        background-color: #a3e635 !important; border-radius: 4px !important;
+        font-size: 0 !important; width: 32px !important; height: 32px !important;
+        background-color: #a3e635 !important; border-radius: 6px !important;
         border: 1px solid #064e3b !important; margin: 2px auto !important;
+        box-shadow: 0px 2px 4px rgba(0,0,0,0.3); transition: 0.3s;
     }}
-    .stFileUploader button::before {{ content: "⬆"; font-size: 14px; color: #064e3b; }}
+    .stFileUploader button:hover {{ transform: scale(1.1); background-color: #bef264 !important; }}
+    .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #064e3b; font-weight: bold; }}
     
-    .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.3); text-align: center; }}
+    .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
     </style>
     
     <div class="header-left">Riyadh Premier League</div>
@@ -88,25 +100,40 @@ elif st.session_state.page == 'squad':
     res = supabase.table("squads").select("*").eq("team_name", team).execute()
     db_data = res.data[0]
     is_locked = db_data['is_locked']
-    names = db_data.get('player_list', [""]*17) # 17 Players
+    names = db_data.get('player_list', [""]*17)
     pics = db_data.get('squad_pics', {}) 
     cap_name = db_data.get('captain_name', "Captain")
     cap_pic = db_data.get('cap_pic', None)
+    team_logo = db_data.get('team_logo', None)
 
-    col_title, col_edit, col_logout = st.columns([3, 1, 1])
-    col_title.title(f"{team}")
+    # Header Layout
+    col_logo, col_title, col_edit, col_logout = st.columns([0.5, 2.5, 1, 1])
+    
+    with col_logo:
+        if team_logo:
+            st.markdown(f'<div class="logo-box"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="logo-box"></div>', unsafe_allow_html=True)
+
+    with col_title:
+        st.title(f"{team}")
+        
     edit_mode = col_edit.toggle("EDIT MODE", value=False, disabled=is_locked)
     if col_logout.button("Logout"): st.session_state.page = 'home'; st.rerun()
+
+    if edit_mode:
+        st.info("Upload Team Logo:")
+        logo_up = st.file_uploader("logo", key="logo_up", label_visibility="collapsed")
+        if logo_up: team_logo = img_to_base64(logo_up)
 
     m_col, c_col = st.columns([3, 1])
 
     with m_col:
-        # 17 Players Grid
         for r in range(3):
             cols = st.columns(6)
             for i in range(6):
                 idx_num = (r * 6) + i
-                if idx_num < 17: # Only show up to 17 players
+                if idx_num < 17:
                     idx = str(idx_num)
                     with cols[i]:
                         p_img = pics.get(idx)
@@ -139,11 +166,12 @@ elif st.session_state.page == 'squad':
         st.markdown('</div>', unsafe_allow_html=True)
 
     if edit_mode:
-        if st.button("💾 SAVE SQUAD & PHOTOS", type="primary", use_container_width=True):
+        if st.button("💾 SAVE ALL CHANGES", type="primary", use_container_width=True):
             supabase.table("squads").update({
                 "captain_name": cap_name,
                 "player_list": names,
                 "squad_pics": pics,
-                "cap_pic": cap_pic
+                "cap_pic": cap_pic,
+                "team_logo": team_logo
             }).eq("team_name", team).execute()
-            st.success("Saved Successfully!"); st.rerun()
+            st.success("Squad, Photos, and Logo Saved!"); st.rerun()
