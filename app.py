@@ -184,7 +184,7 @@ elif st.session_state.page == 'squad':
 
     # Upper Branding Area
     col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
-    
+    edit_mode = st.toggle("EDIT MODE", value=False, disabled=is_locked)
     with col_logo:
         if team_logo:
             st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
@@ -202,7 +202,7 @@ elif st.session_state.page == 'squad':
             st.session_state.page = 'home'
             st.rerun()
         
-        edit_mode = st.toggle("EDIT MODE", value=False, disabled=is_locked)
+        
 
     m_col, c_col = st.columns([3, 1])
 
