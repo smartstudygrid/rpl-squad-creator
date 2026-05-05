@@ -94,7 +94,7 @@ st.markdown(f"""
         background-color: #facc15 !important; border-radius: 4px !important;
         border: 1px solid #854d0e !important; margin: 2px auto !important;
     }}
-    .stFileUploader button::before {{ content: "⬆"; font-size: 16px; color: #000; font-weight: bold; }}
+    .stFileUploader button::before {{ content: "upload"; font-size: 14px; color: #000; font-weight: bold; }}
     
     /* CAPTAIN BADGE: Consolidated into one capsule */
     .captain-badge {{
