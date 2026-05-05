@@ -1,102 +1,173 @@
 import streamlit as st
-import pandas as pd
-from PIL import Image
+from supabase import create_client, Client
 
-# --- CONFIGURATION & BRANDING ---
-st.set_page_config(page_title="Riyadh Premier League", layout="wide")
+# --- DATABASE CONNECTION ---
+url = st.secrets["SUPABASE_URL"]
+key = st.secrets["SUPABASE_KEY"]
+supabase: Client = create_client(url, key)
 
-# Custom CSS for the "Sporty" Look and Header/Footer Requirements
+# --- PAGE CONFIG ---
+st.set_page_config(page_title="Riyadh Premier League", layout="wide", initial_sidebar_state="collapsed")
+
+# --- CSS FOR THE EXACT PDF LAYOUT ---
 st.markdown(f"""
     <style>
-    .main {{ background-color: #f0f2f6; }}
-    .header-left {{ position: absolute; top: -50px; left: 0; font-weight: bold; font-size: 24px; color: #1e3a8a; }}
-    .header-right {{ position: absolute; top: -50px; right: 0; font-size: 14px; color: #666; }}
-    .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 12px; }}
-    .captain-card {{ background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; border: 3px solid #ffd700; }}
-    .player-card {{ background: white; padding: 10px; border-radius: 10px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); text-align: center; }}
+    /* Full-screen background */
+    .stApp {{
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        background-size: cover;
+    }}
+    
+    .header-left {{ position: absolute; top: 10px; left: 20px; font-weight: bold; font-size: 28px; color: #white; text-shadow: 2px 2px 4px #000; }}
+    .header-right {{ position: absolute; top: 10px; right: 20px; font-size: 16px; color: #ddd; }}
+    .footer-left {{ position: fixed; bottom: 10px; left: 10px; font-size: 14px; color: white; }}
+    
+    /* Grid Layout for Players */
+    .player-slot {{
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        color: white;
+        margin-bottom: 10px;
+    }}
+    .player-name {{
+        background-color: #a3e635;
+        color: #064e3b;
+        font-weight: bold;
+        padding: 5px;
+        margin-top: 5px;
+        border-radius: 4px;
+        font-size: 14px;
+    }}
+    .captain-container {{
+        background: rgba(255, 255, 255, 0.2);
+        border: 3px solid #facc15;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        height: 100%;
+    }}
+    .captain-name-tag {{
+        background-color: #a3e635;
+        color: #064e3b;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }}
     </style>
-    <div class="header-left">Riyadh Premier League</div>
+    
+    <div class="header-left">🏏 Riyadh Premier League</div>
     <div class="header-right">Created by: Amanullah Khan</div>
-    <div class="footer-left"><a href="https://www.smartstudygrid.com">www.smartstudygrid.com</a></div>
+    <div class="footer-left"><a href="http://www.smartstudygrid.com" style="color: white; text-decoration: none;">www.smartstudygrid.com</a></div>
 """, unsafe_allow_html=True)
 
-# --- DATABASE MOCKUP (Replace with Supabase for permanent storage) ---
-# For now, this uses Streamlit Session State to demonstrate the logic
-if 'app_locked' not in st.session_state:
-    st.session_state.app_locked = False
+# --- SESSION STATE FOR NAVIGATION ---
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
+if 'team' not in st.session_state:
+    st.session_state.team = None
 
-TEAMS = {
-    "Kaptan XI": "pass123",
-    "Pak Eagles": "pass456",
-    "Riyadh Badshahs": "pass789",
-    "Riyadh Mavericks": "mavs2026",
-    "Riyadh Stallions": "stallion1",
-    "Wazirabad Stars": "wazir1"
-}
+TEAMS = ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"]
 
-# --- ADMIN PANEL (Hidden Sidebar) ---
-with st.sidebar:
-    st.header("⚙️ Admin Control")
-    admin_pass = st.text_input("Admin Password", type="password")
-    if admin_pass == "admin123": # Change this!
-        st.session_state.app_locked = st.checkbox("Lock App (Disable Updates)", value=st.session_state.app_locked)
-        if st.session_state.app_locked:
-            st.error("SQUAD UPDATES ARE LOCKED")
-        else:
-            st.success("SQUAD UPDATES ARE OPEN")
-
-# --- MAIN INTERFACE ---
-st.title("🏆 Squad Management Portal")
-
-# 1. Team Selection
-team_choice = st.selectbox("Select your Team", ["---"] + list(TEAMS.keys()))
-
-if team_choice != "---":
-    password = st.text_input(f"Enter Password for {team_choice}", type="password")
+# --- HOME SCREEN ---
+if st.session_state.page == 'home':
+    st.write("#")
+    col1, col2 = st.columns(2)
     
-    if password == TEAMS[team_choice]:
-        st.success(f"Welcome, Captain of {team_choice}!")
+    with col1:
+        st.markdown("<div style='background:rgba(255,255,255,0.1); padding:40px; border-radius:20px; text-align:center;'>", unsafe_allow_html=True)
+        st.subheader("Admin Portal")
+        admin_p = st.text_input("Admin Password", type="password")
+        if st.button("Login as Admin"):
+            if admin_p == "admin123":
+                st.session_state.page = 'admin'
+                st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("<div style='background:rgba(255,255,255,0.1); padding:40px; border-radius:20px; text-align:center;'>", unsafe_allow_html=True)
+        st.subheader("Team Login")
+        team_sel = st.selectbox("Choose your team", TEAMS)
+        team_p = st.text_input("Team Password", type="password")
+        if st.button("Login to Squad"):
+            # Simple check for demo; link to your database passwords in production
+            if team_p != "":
+                st.session_state.page = 'squad'
+                st.session_state.team = team_sel
+                st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# --- SQUAD SCREEN (Matching PDF Layout) ---
+elif st.session_state.page == 'squad':
+    team = st.session_state.team
+    # Fetch Data
+    team_data = supabase.table("squads").select("*").eq("team_name", team).single().execute().data
+    is_locked = team_data.get('is_locked', False)
+    players = team_data.get('player_list', [""] * 18)
+    captain = team_data.get('captain_name', "Captain Name")
+
+    st.title(f"{team} Squad")
+    
+    if is_locked:
+        st.warning("⚠️ Updates Locked by Admin")
+
+    # Layout Grid: 3 Rows of 6 Players, and a large Captain Slot
+    # Total 18 small slots + 1 Large Captain Slot
+    
+    main_col, cap_col = st.columns([3, 1])
+
+    with main_col:
+        # Rows 1 & 2 (12 players)
+        for row in range(2):
+            cols = st.columns(6)
+            for i in range(6):
+                idx = (row * 6) + i
+                with cols[i]:
+                    st.markdown('<div class="player-slot"><div style="height:80px; width:80px; background:#ddd; border-radius:50%; margin:auto;"></div></div>', unsafe_allow_html=True)
+                    players[idx] = st.text_input(f"Name {idx+1}", value=players[idx], label_visibility="collapsed", disabled=is_locked)
+                    st.markdown(f'<div class="player-name">{players[idx] if players[idx] else "Empty"}</div>', unsafe_allow_html=True)
         
-        if st.session_state.app_locked:
-            st.warning("⚠️ The Administrator has locked squad updates. You can view but not edit.")
+        # Row 3 (Remaining 5 players)
+        cols3 = st.columns(6)
+        for i in range(5):
+            idx = 12 + i
+            with cols3[i]:
+                st.markdown('<div class="player-slot"><div style="height:80px; width:80px; background:#ddd; border-radius:50%; margin:auto;"></div></div>', unsafe_allow_html=True)
+                players[idx] = st.text_input(f"Name {idx+1}", value=players[idx], label_visibility="collapsed", disabled=is_locked)
+                st.markdown(f'<div class="player-name">{players[idx] if players[idx] else "Empty"}</div>', unsafe_allow_html=True)
 
-        # --- UPLOAD SECTION ---
-        col1, col2 = st.columns([1, 2])
-        
-        with col1:
-            st.subheader("Team Identity")
-            logo = st.file_uploader("Upload Team Logo", disabled=st.session_state.app_locked)
-            cap_pic = st.file_uploader("Upload Captain's Picture (Prominent)", disabled=st.session_state.app_locked)
-            cap_name = st.text_input("Captain Name", disabled=st.session_state.app_locked)
+    with cap_col:
+        st.markdown('<div class="captain-container">', unsafe_allow_html=True)
+        st.write("### CAPTAIN")
+        st.markdown('<div style="height:250px; width:250px; background:#eee; border-radius:50%; margin:auto; border:5px solid #a3e635;"></div>', unsafe_allow_html=True)
+        captain = st.text_input("Captain Name", value=captain, label_visibility="collapsed", disabled=is_locked)
+        st.markdown(f'<div class="captain-name-tag">{captain}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        with col2:
-            st.subheader("Squad Members (18 Total)")
-            player_data = []
-            for i in range(1, 19):
-                name = st.text_input(f"Player {i} Name", key=f"p{i}", disabled=st.session_state.app_locked)
-                # In a live app, you'd add a file_uploader for each player here
+    # Actions
+    st.write("#")
+    c1, c2, c3 = st.columns([1,1,1])
+    if c2.button("💾 SAVE SQUAD", use_container_width=True) and not is_locked:
+        supabase.table("squads").update({"captain_name": captain, "player_list": players}).eq("team_name", team).execute()
+        st.success("Saved!")
+    
+    if st.button("⬅ Log Out"):
+        st.session_state.page = 'home'
+        st.rerun()
 
-        # --- VISUAL DISPLAY (The "Enhancement") ---
-        st.divider()
-        st.header(f"Final Squad: {team_choice}")
-        
-        # Display Captain
-        c_col1, c_col2, c_col3 = st.columns([1, 1, 1])
-        with c_col2:
-            st.markdown(f'<div class="captain-card"><h3>CAPTAIN</h3><h2>{cap_name if cap_name else "Assign Captain"}</h2></div>', unsafe_allow_html=True)
-            if cap_pic:
-                st.image(cap_pic, use_container_width=True)
-
-        # Display Players in a Grid
-        st.subheader("Team Players")
-        cols = st.columns(3)
-        for i in range(1, 19):
-            with cols[(i-1) % 3]:
-                st.markdown(f'<div class="player-card"><b>Player {i}</b><br>{st.session_state.get(f"p{i}", "Empty Slot")}</div>', unsafe_allow_html=True)
-                st.write("") # Spacer
-
-    elif password != "":
-        st.error("Incorrect Password")
-
-else:
-    st.info("Please select your team from the dropdown to manage your squad.")
+# --- ADMIN SCREEN ---
+elif st.session_state.page == 'admin':
+    st.subheader("Master Admin Control")
+    if st.button("Toggle App Lock"):
+        # Flip the lock for all teams
+        new_val = not is_app_locked
+        supabase.table("squads").update({"is_locked": new_val}).neq("team_name", "").execute()
+        st.rerun()
+    if st.button("Back to Home"):
+        st.session_state.page = 'home'
+        st.rerun()
