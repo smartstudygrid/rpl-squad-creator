@@ -182,31 +182,26 @@ elif st.session_state.page == 'squad':
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
 
-    # --- HEADER SECTION (REPLACING OLD LINES 185-201) ---
+    # Upper Branding Area
     col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
     
-    # We define col_edit FIRST so the toggle variable is ready
-    with col_edit:
-        if st.button("🏠", key="home_icon_btn"):
-            st.session_state.page = 'home'
-            st.rerun()
-        edit_mode = st.toggle("EDIT MODE", value=False, disabled=is_locked)
-
     with col_logo:
         if team_logo:
             st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="logo-circle"></div>', unsafe_allow_html=True)
-        
-        # This now shows the upload button under the logo when Edit Mode is ON
-        if edit_mode:
-            logo_up = st.file_uploader("L", key="logo_up", label_visibility="collapsed")
-            if logo_up:
-                team_logo = img_to_base64(logo_up)
 
     with col_title:
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
-    # --- END OF HEADER SECTION --- = st.columns([3, 1])
+        
+    with col_edit:
+        if st.button("🏠", key="home_icon_btn"):
+            st.session_state.page = 'home'
+            st.rerun()
+        
+        edit_mode = st.toggle("EDIT MODE", value=False, disabled=is_locked)
+
+    m_col, c_col = st.columns([3, 1])
 
     with m_col:
         for r in range(3):
