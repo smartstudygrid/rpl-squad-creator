@@ -73,17 +73,7 @@ st.markdown(f"""
     
     .squad-container {{ margin-top: -50px; }}
     
-    /* Logo: CIRCLE */
-    .logo-circle {{
-        width: 110px; height: 110px; 
-        background: rgba(255,255,255,0.2); 
-        border: 3px solid #facc15;
-        border-radius: 50%; 
-        overflow: hidden; 
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0px 0px 15px rgba(250, 215, 0, 0.4);
-    }}
-    .logo-circle img {{ width: 100%; height: 100%; object-fit: cover; }}
+    
     
     /* SQUARE Player Boxes */
     .img-box {{
