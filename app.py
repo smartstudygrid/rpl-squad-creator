@@ -184,14 +184,7 @@ elif st.session_state.page == 'squad':
     with col_title:
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
         
-    with col_actions:
-        # 1. Home Button (Sits on top)
-        if st.button("🏠 Home", use_container_width=True):
-            st.session_state.page = 'home'
-            st.rerun()
-            
-        # 2. Edit Toggle (Sits directly below Home)
-        edit_mode = st.toggle("EDIT MODE", value=False, disabled=is_locked)
+    edit_mode = col_edit.toggle("EDIT MODE", value=False, disabled=is_locked)
 
     m_col, c_col = st.columns([3, 1])
 
