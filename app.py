@@ -205,7 +205,6 @@ elif st.session_state.page == 'squad':
     with col_title:
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
 
-    # This line MUST stay here to create the player area
     m_col, c_col = st.columns([3, 1])
 
     with m_col:
