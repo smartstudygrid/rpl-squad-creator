@@ -109,7 +109,7 @@ st.markdown(f"""
         font-size: 20px;
         display: inline-flex;
         align-items: right;
-        justify-content: center;
+        justify-content: right;
         gap: 10px;
         margin-bottom: 10px;
     }}
