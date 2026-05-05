@@ -204,10 +204,8 @@ elif st.session_state.page == 'squad':
                 team_logo = img_to_base64(logo_up)
 
     with col_title:
-        st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
+        st.markdown(f'<h1 class="team-title">{{team}}</h1>', unsafe_allow_html=True)
 
-    # --- MAIN CONTENT AREA ---
-    # Make sure this line starts at the far left, aligned with "with col_title"
     m_col, c_col = st.columns([3, 1])
 
     with m_col:
