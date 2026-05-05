@@ -51,15 +51,14 @@ st.markdown(f"""
         color: white !important; 
         font-weight: bold !important; 
         font-size: 16px !important;
-        background: #facc15 !important; /* Solid Yellow for Visibility */
+        background: #facc15 !important; 
         padding: 5px 15px;
         border-radius: 20px;
         border: 2px solid #854d0e;
     }}
     
-    .squad-container {{ margin-top: -20px; }} /* Moved up to look better */
+    .squad-container {{ margin-top: -20px; }} 
     
-    /* Logo: CIRCLE */
     .logo-circle {{
         width: 110px; height: 110px; 
         background: rgba(255,255,255,0.2); 
@@ -71,9 +70,6 @@ st.markdown(f"""
     }}
     .logo-circle img {{ width: 100%; height: 100%; object-fit: cover; }}
 
-
-    
-    /* SQUARE Player Boxes */
     .img-box {{
         width: 110px; height: 110px; background: rgba(255,255,255,0.1); border: 2px solid #a3e635;
         border-radius: 4px; margin: 0 auto 5px auto; overflow: hidden;
@@ -83,7 +79,6 @@ st.markdown(f"""
     
     .plain-name {{ color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 2px; text-align: center; }}
 
-    /* Upload Icon - Matched to Yellow */
     .stFileUploader label {{ display: none; }}
     .stFileUploader section {{
         padding: 0 !important; min-height: unset !important; border: none !important; background: transparent !important;
@@ -95,11 +90,24 @@ st.markdown(f"""
         border: 1px solid #854d0e !important; margin: 2px auto !important;
     }}
     .stFileUploader button::before {{ content: "↑"; font-size: 14px; color: #000; font-weight: bold; }}
-    
-    
-    
-   
-    
+
+    .captain-badge {{
+        border: 4px solid #facc15;
+        padding: 8px 20px;
+        border-radius: 25px; 
+        background: rgba(0,0,0,0.8);
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }}
+    .captain-frame {{ border: 4px solid #facc15; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4); text-align: center; }}
+    </style>
+
     <div class="header-center">Riyadh Premier League</div>
     <div class="header-right">Created by: Amanullah Khan</div>
     <div class="footer-left">www.smartstudygrid.com</div>
@@ -121,12 +129,15 @@ if st.session_state.page == 'home':
     st.write("##")
     c1, c2, c3 = st.columns([1,1.5,1])
     with c2:
-        st.write("##### Riyadh Premier League")
+        st.markdown("<div style='background:rgba(0,0,0,0.6); padding:40px; border-radius:20px; border: 1px solid #facc15; text-align:center;'>", unsafe_allow_html=True)
+        st.write("### 🏆 Create Your Squad")
         t = st.selectbox("Select Your Team", ["Kaptan XI", "Pak Eagles", "Riyadh Badshahs", "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"])
-    p = st.text_input("Enter Password", type="password")
+        p = st.text_input("Enter Password", type="password")
         if st.button("Enter Dashboard", use_container_width=True):
-            # Passwords check here
-            st.session_state.page = 'squad'; st.session_state.team = t; st.rerun()
+            # Passwords check should ideally be here
+            st.session_state.page = 'squad'
+            st.session_state.team = t
+            st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
 # --- SQUAD SCREEN ---
@@ -143,7 +154,6 @@ elif st.session_state.page == 'squad':
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
 
-    # Upper Branding Area (Shifted Up)
     col_logo, col_title, col_edit = st.columns([0.8, 4.2, 1])
     
     with col_logo:
@@ -182,7 +192,6 @@ elif st.session_state.page == 'squad':
 
     with c_col:
         st.markdown('<div class="captain-frame">', unsafe_allow_html=True)
-        # Redundant rectangle removed; star and text placed in gold badge
         st.markdown(f'<div class="captain-badge">⭐ CAPTAIN</div>', unsafe_allow_html=True)
         
         if cap_pic:
@@ -207,4 +216,5 @@ elif st.session_state.page == 'squad':
                 "cap_pic": cap_pic,
                 "team_logo": team_logo
             }).eq("team_name", team).execute()
-            st.success("Squad Saved Successfully!"); st.rerun()
+            st.success("Squad Saved Successfully!")
+            st.rerun()
