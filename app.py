@@ -190,10 +190,7 @@ elif st.session_state.page == 'squad':
             st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="logo-circle"></div>', unsafe_allow_html=True)
-    if edit_mode:
-            logo_up = st.file_uploader("L", key="logo_up", label_visibility="collapsed")
-            if logo_up:
-                team_logo = img_to_base64(logo_up)
+    
     with col_title:
         st.markdown(f'<h1 class="team-title">{team}</h1>', unsafe_allow_html=True)
         
