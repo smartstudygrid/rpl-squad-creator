@@ -152,7 +152,7 @@ if st.session_state.page == 'home':
         st.write("### 🔒 League Admin")
         admin_pass = st.text_input("Admin Password", type="password", key="admin_p")
         
-        if admin_pass == "admin123":
+        if admin_pass == "Pakistan1947":
             col_lock, col_unlock = st.columns(2)
             if col_lock.button("🔒 LOCK ALL", use_container_width=True):
                 supabase.table("squads").update({"is_locked": True}).neq("team_name", "temp").execute()
