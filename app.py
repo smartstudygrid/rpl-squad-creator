@@ -6,8 +6,8 @@ from PIL import Image
 
 # --- 1. DATABASE CONNECTION ---
 try:
-    url = st.secrets["SUPABASE_URL"]
-    key = st.secrets["SUPABASE_KEY"]
+    url = st.secrets["https://blhxvguboircijscdhhn.supabase.co"]
+    key = st.secrets["sb_publishable_3Q3wcRqlLi86GrlygGeEaA_UjWlp66L"]
     supabase: Client = create_client(url, key)
 except Exception as e:
     st.error("Connection Error: Check your Streamlit Secrets.")
