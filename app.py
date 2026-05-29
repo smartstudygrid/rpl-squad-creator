@@ -6,11 +6,11 @@ from PIL import Image
 
 # --- 1. DATABASE CONNECTION ---
 try:
-    url = st.secrets["https://blhxvguboircijscdhhn.supabase.co"]
-    key = st.secrets["sb_publishable_3Q3wcRqlLi86GrlygGeEaA_UjWlp66L"]
+    url = "https://blhxvguboircijscdhhn.supabase.co"
+    key = "sb_publishable_3Q3wcRqlLi86GrlygGeEaA_UjWlp66L"
     supabase: Client = create_client(url, key)
 except Exception as e:
-    st.error("Connection Error: Check your Streamlit Secrets.")
+    st.error(f"Connection Error: {e}")
     st.stop()
 
 # --- 2. PAGE CONFIG ---
@@ -454,6 +454,41 @@ st.markdown("""
         margin-bottom: 12px;
     }
 
+    /* ===== VIEW SQUAD BUTTON (blue outline style) ===== */
+    .stButton > button[kind="secondary"] {
+        background: transparent !important;
+        color: #7ab3ff !important;
+        border: 1px solid rgba(100,160,255,0.4) !important;
+        font-family: 'Oswald', sans-serif !important;
+        font-weight: 600 !important;
+        letter-spacing: 3px !important;
+        font-size: 13px !important;
+        text-transform: uppercase !important;
+        border-radius: 6px !important;
+        padding: 10px 24px !important;
+        transition: all 0.2s !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        background: rgba(100,160,255,0.08) !important;
+        border-color: rgba(100,160,255,0.7) !important;
+        box-shadow: 0 0 16px rgba(100,160,255,0.2) !important;
+    }
+
+    /* ===== VIEW MODE BADGE ===== */
+    .view-mode-badge {
+        background: linear-gradient(90deg, rgba(100,160,255,0.1), rgba(100,160,255,0.18), rgba(100,160,255,0.1));
+        border: 1px solid rgba(100,160,255,0.35);
+        border-radius: 6px;
+        padding: 7px 14px;
+        text-align: center;
+        font-family: 'Rajdhani', sans-serif;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: #7ab3ff;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
     /* ===== FOOTER ===== */
     .rpl-footer {
         position: fixed;
@@ -490,6 +525,7 @@ def img_to_base64(image_file):
 # --- 5. APP STATE ---
 if 'page' not in st.session_state: st.session_state.page = 'home'
 if 'team' not in st.session_state: st.session_state.team = None
+if 'view_only' not in st.session_state: st.session_state.view_only = False
 
 # =============================================
 # --- NAVIGATION: LOGIN SCREEN ---
@@ -510,9 +546,18 @@ if st.session_state.page == 'home':
             if p == "myteam123":
                 st.session_state.page = 'squad'
                 st.session_state.team = t
+                st.session_state.view_only = False
                 st.rerun()
             else:
                 st.error("Incorrect password.")
+
+        st.markdown('<div style="height:6px;"></div>', unsafe_allow_html=True)
+
+        if st.button("👁️  View Squad", use_container_width=True, type="secondary"):
+            st.session_state.page = 'squad'
+            st.session_state.team = t
+            st.session_state.view_only = True
+            st.rerun()
 
         st.markdown('<hr class="admin-divider">', unsafe_allow_html=True)
         st.markdown('<div class="admin-label">🔒 League Admin</div>', unsafe_allow_html=True)
@@ -551,6 +596,7 @@ elif st.session_state.page == 'squad':
     cap_name = db_data.get('captain_name', "Captain")
     cap_pic = db_data.get('cap_pic', None)
     team_logo = db_data.get('team_logo', None)
+    view_only = st.session_state.get('view_only', False)
 
     # --- TEAM HEADER BAR ---
     col_logo, col_title, col_ctrl = st.columns([0.6, 4, 1.4])
@@ -566,7 +612,9 @@ elif st.session_state.page == 'squad':
         st.markdown('<div class="team-subtitle-tag">Riyadh Premier League &nbsp;·&nbsp; Season 2026</div>', unsafe_allow_html=True)
 
     with col_ctrl:
-        if is_locked:
+        if view_only:
+            st.markdown('<div class="view-mode-badge">👁 View Only</div>', unsafe_allow_html=True)
+        elif is_locked:
             st.markdown('<div class="locked-banner">🔒 Locked</div>', unsafe_allow_html=True)
         hcol, ecol = st.columns([1, 2])
         with hcol:
@@ -574,7 +622,10 @@ elif st.session_state.page == 'squad':
                 st.session_state.page = 'home'
                 st.rerun()
         with ecol:
-            edit_mode = st.toggle("EDIT", value=False, disabled=is_locked)
+            if view_only:
+                edit_mode = False
+            else:
+                edit_mode = st.toggle("EDIT", value=False, disabled=is_locked)
 
     # Logo upload in edit mode
     if edit_mode:
