@@ -381,7 +381,7 @@ st.markdown("""
         display: flex; align-items: center; justify-content: center;
         position: relative;
     }
-    .captain-img-area img { width: 100%; height: 100%; object-fit: cover; }
+    .captain-img-area img { width: 100%; height: 100%; object-fit: contain; }
 
     /* Captain number badge */
     .captain-num {
