@@ -508,7 +508,7 @@ st.markdown("""
         <div class="league-title">&#9670; Season 2026 &#9670;</div>
         <div class="league-name">Riyadh Premier League</div>
         <div class="league-subtitle">Build Your Ultimate Dream Squad</div>
-        <div class="league-divider"></div>
+        
     </div>
     <div class="rpl-footer">www.smartstudygrid.com &nbsp;|&nbsp; Created by Amanullah Khan</div>
 """, unsafe_allow_html=True)
