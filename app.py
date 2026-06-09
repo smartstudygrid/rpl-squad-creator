@@ -174,7 +174,6 @@ st.markdown("""
     .logo-circle {
         width: 140px; height: 140px;
         border-radius: 50%;
-        border: 3px solid #c8a84b;
         overflow: hidden;
         background: rgba(0,20,60,0.8);
         display: flex; align-items: center; justify-content: center;
