@@ -374,7 +374,10 @@ st.markdown("""
 
     .captain-img-area {
         width: 100%;
-        aspect-ratio: 1/1;
+        aspect-ratio: unset;
+        height: calc(var(--player-row-height, 38vw) * 0.36);
+        min-height: 260px;
+        max-height: 340px;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
         display: flex; align-items: center; justify-content: center;
@@ -659,7 +662,7 @@ elif st.session_state.page == 'squad':
     st.markdown('<div style="height:12px;"></div>', unsafe_allow_html=True)
 
     # ===== SQUAD GRID + CAPTAIN =====
-    main_col, cap_col = st.columns([3.8, 1.6])
+    main_col, cap_col = st.columns([3.8, 1.2])
 
     with main_col:
         # 3 rows × 6 columns = 18 slots (we use 17)
