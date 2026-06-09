@@ -373,7 +373,7 @@ st.markdown("""
     .captain-card-inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
     .captain-img-area {
-        width: 340px;
+        width: 300px;
         height: 340px;
         aspect-ratio: 1/1;
         overflow: hidden;
