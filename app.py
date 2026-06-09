@@ -373,14 +373,15 @@ st.markdown("""
     .captain-card-inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
     .captain-img-area {
-        width: 100%;
-        height: auto;
+        width: 340px;
+        height: 340px;
+        aspect-ratio: 1/1;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
         display: flex; align-items: center; justify-content: center;
         position: relative;
     }
-    .captain-img-area img { width: 100%; height: auto; object-fit: contain; display: block; }
+    .captain-img-area img { width: 100%; height: 100%; object-fit: contain; }
 
     /* Captain number badge */
     .captain-num {
@@ -713,7 +714,7 @@ elif st.session_state.page == 'squad':
         st.markdown('<div class="captain-section">', unsafe_allow_html=True)
 
         if cap_pic:
-            cap_img_html = f'<img src="data:image/jpeg;base64,{cap_pic}" style="width:100%;height:auto;display:block;object-fit:contain;">'
+            cap_img_html = f'<img src="data:image/jpeg;base64,{cap_pic}">'
         else:
             cap_img_html = '''<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:45%;height:45%;opacity:0.15;">
                 <circle cx="12" cy="8" r="4" stroke="#c8a84b" stroke-width="1.5"/>
@@ -729,7 +730,7 @@ elif st.session_state.page == 'squad':
                     <div class="captain-label">★ Captain ★</div>
                     <div class="captain-num">18</div>
                     <div class="captain-star">★</div>
-                    <div class="captain-img-area" style="width:100%;height:auto;overflow:hidden;">{cap_img_html}</div>
+                    <div class="captain-img-area">{cap_img_html}</div>
                     <div class="captain-name-bar">
                         <div class="captain-name-text">{cap_name_display}</div>
                     </div>
