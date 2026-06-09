@@ -373,15 +373,14 @@ st.markdown("""
     .captain-card-inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
     .captain-img-area {
-        width: 300px;
-        height: 340px;
-        aspect-ratio: 1/1;
+        width: 100%;
+        aspect-ratio: 3/4;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
         display: flex; align-items: center; justify-content: center;
         position: relative;
     }
-    .captain-img-area img { width: 100%; height: 100%; object-fit: contain; }
+    .captain-img-area img { width: 100%; height: 100%; object-fit: cover; }
 
     /* Captain number badge */
     .captain-num {
