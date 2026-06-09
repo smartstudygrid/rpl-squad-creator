@@ -376,7 +376,7 @@ st.markdown("""
         width: 100%;
         aspect-ratio: unset;
         height: calc(var(--player-row-height, 38vw) * 0.36);
-        min-height: 300px;
+        min-height: 340px;
         max-height: 300px;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
