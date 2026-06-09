@@ -374,6 +374,7 @@ st.markdown("""
 
     .captain-img-area {
         width: 100%;
+        aspect-ratio: 1 / 1;
         min-height: 140px;
         max-height: 240px;
         overflow: hidden;
