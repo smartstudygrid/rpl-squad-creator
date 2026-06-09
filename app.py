@@ -532,7 +532,7 @@ if 'view_only' not in st.session_state: st.session_state.view_only = False
 if st.session_state.page == 'home':
     _, c2, _ = st.columns([1, 1.4, 1])
     with c2:
-        st.markdown('<div class="login-container">', unsafe_allow_html=True)
+        
         st.markdown('<div class="login-title">⚡ Enter Your Squad</div>', unsafe_allow_html=True)
 
         t = st.selectbox("Select Your Team", [
