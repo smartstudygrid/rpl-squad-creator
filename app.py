@@ -373,7 +373,7 @@ st.markdown("""
     .captain-card-inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
     .captain-img-area {
-        width: 100%;
+        width: 80%;
         aspect-ratio: unset;
         height: calc(var(--player-row-height, 38vw) * 0.36);
         min-height: 340px;
