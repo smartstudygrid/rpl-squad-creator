@@ -374,8 +374,6 @@ st.markdown("""
 
     .captain-img-area {
         width: 100%;
-        aspect-ratio: unset;
-        height: calc(var(--player-row-height, 38vw) * 0.36);
         min-height: 240px;
         max-height: 340px;
         overflow: hidden;
