@@ -373,10 +373,9 @@ st.markdown("""
     .captain-card-inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
     .captain-img-area {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        min-height: 140px;
-        max-height: 240px;
+        width: 340px;
+        height: 340px;
+        aspect-ratio: 1/1;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
         display: flex; align-items: center; justify-content: center;
