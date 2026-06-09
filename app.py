@@ -374,8 +374,8 @@ st.markdown("""
 
     .captain-img-area {
         width: 100%;
-        min-height: 240px;
-        max-height: 340px;
+        min-height: 140px;
+        max-height: 240px;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
         display: flex; align-items: center; justify-content: center;
