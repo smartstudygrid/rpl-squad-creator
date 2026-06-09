@@ -153,7 +153,7 @@ st.markdown("""
     }
     .stToggle label p {
         font-family: 'Rajdhani', sans-serif !important;
-        color: #f5d073 !important;
+        color: #ffffff !important;
         font-weight: 700 !important;
         font-size: 13px !important;
         letter-spacing: 2px !important;
@@ -476,6 +476,7 @@ st.markdown("""
 
     /* ===== VIEW MODE BADGE ===== */
     .view-mode-badge {
+        display: inline-block;
         background: linear-gradient(90deg, rgba(100,160,255,0.1), rgba(100,160,255,0.18), rgba(100,160,255,0.1));
         border: 1px solid rgba(100,160,255,0.35);
         border-radius: 6px;
@@ -486,7 +487,7 @@ st.markdown("""
         letter-spacing: 3px;
         color: #7ab3ff;
         text-transform: uppercase;
-        margin-bottom: 12px;
+        white-space: nowrap;
     }
 
     /* ===== FOOTER ===== */
@@ -607,27 +608,29 @@ elif st.session_state.page == 'squad':
     view_only = st.session_state.get('view_only', False)
 
     # --- TEAM HEADER BAR ---
-    col_logo, col_title = st.columns([0.6, 5])
+    if team_logo:
+        logo_html = f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>'
+    else:
+        logo_html = '<div class="logo-placeholder"></div>'
 
-    with col_logo:
-        if team_logo:
-            st.markdown(f'<div class="logo-circle"><img src="data:image/jpeg;base64,{team_logo}"></div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="logo-placeholder"></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+        <div class="team-header-wrap">
+            {logo_html}
+            <div>
+                <div class="team-name-display">{team}</div>
+                <div class="team-subtitle-tag">Challenger's Cup &nbsp;·&nbsp; Season 18 2026</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-    with col_title:
-        st.markdown(f'<div class="team-name-display">{team}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="team-subtitle-tag">Challenger\'s Cup &nbsp;·&nbsp; Season 18 2026</div>', unsafe_allow_html=True)
-        if view_only:
-            st.markdown('<div class="view-mode-badge">👁 View Only</div>', unsafe_allow_html=True)
-        elif is_locked:
-            st.markdown('<div class="locked-banner">🔒 Locked</div>', unsafe_allow_html=True)
+    if is_locked and not view_only:
+        st.markdown('<div class="locked-banner">🔒 Squad is Locked</div>', unsafe_allow_html=True)
 
-    # Determine edit_mode (toggle rendered later in the action bar)
+    # Determine edit_mode from session state (toggle is rendered in action bar below)
     if view_only:
         edit_mode = False
     else:
-        edit_mode = st.toggle("✏️ EDIT MODE", value=False, disabled=is_locked)
+        edit_mode = st.session_state.get("edit_toggle", False) and not is_locked
 
     # Logo upload in edit mode
     if edit_mode:
@@ -727,20 +730,31 @@ elif st.session_state.page == 'squad':
     # ===== ACTION BAR (always visible) =====
     st.markdown('<div style="height:16px;"></div>', unsafe_allow_html=True)
     st.divider()
-    action_home, action_spacer, action_save = st.columns([1, 3, 2])
-    with action_home:
-        if st.button("🏠 Home", key="home_btn", use_container_width=True):
-            st.session_state.page = 'home'
-            st.rerun()
-    with action_save:
-        if edit_mode:
-            if st.button("💾  Save All Changes", type="primary", use_container_width=True):
-                supabase.table("squads").update({
-                    "captain_name": cap_name,
-                    "player_list": names,
-                    "squad_pics": pics,
-                    "cap_pic": cap_pic,
-                    "team_logo": team_logo
-                }).eq("team_name", team).execute()
-                st.success("✅ Squad saved successfully!")
+    if view_only:
+        act_home, act_badge, act_spacer = st.columns([1, 1.2, 4])
+        with act_home:
+            if st.button("🏠 Home", key="home_btn", use_container_width=True):
+                st.session_state.page = 'home'
                 st.rerun()
+        with act_badge:
+            st.markdown('<div class="view-mode-badge">👁 View Only</div>', unsafe_allow_html=True)
+    else:
+        act_home, act_edit, act_spacer, act_save = st.columns([1, 1.5, 2, 2])
+        with act_home:
+            if st.button("🏠 Home", key="home_btn", use_container_width=True):
+                st.session_state.page = 'home'
+                st.rerun()
+        with act_edit:
+            edit_mode = st.toggle("✏️ EDIT MODE", value=False, disabled=is_locked, key="edit_toggle")
+        with act_save:
+            if edit_mode:
+                if st.button("💾  Save All Changes", type="primary", use_container_width=True):
+                    supabase.table("squads").update({
+                        "captain_name": cap_name,
+                        "player_list": names,
+                        "squad_pics": pics,
+                        "cap_pic": cap_pic,
+                        "team_logo": team_logo
+                    }).eq("team_name", team).execute()
+                    st.success("✅ Squad saved successfully!")
+                    st.rerun()
