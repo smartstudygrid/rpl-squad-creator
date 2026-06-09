@@ -337,7 +337,7 @@ st.markdown("""
     .captain-card-outer {
         position: relative;
         width: 100%;
-        max-width: 200px;
+        max-width: 100%;
     }
     .captain-card-glow {
         position: absolute;
@@ -659,7 +659,7 @@ elif st.session_state.page == 'squad':
     st.markdown('<div style="height:12px;"></div>', unsafe_allow_html=True)
 
     # ===== SQUAD GRID + CAPTAIN =====
-    main_col, cap_col = st.columns([3.8, 1.2])
+    main_col, cap_col = st.columns([3.8, 1.6])
 
     with main_col:
         # 3 rows × 6 columns = 18 slots (we use 17)
