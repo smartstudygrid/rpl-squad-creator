@@ -14,7 +14,7 @@ except Exception as e:
     st.stop()
 
 # --- 2. PAGE CONFIG ---
-st.set_page_config(page_title="Riyadh Premier League", layout="wide")
+st.set_page_config(page_title="Challenger's Cup", layout="wide")
 
 # --- 3. CUSTOM CSS ---
 st.markdown("""
@@ -169,7 +169,7 @@ st.markdown("""
         margin-bottom: 24px;
     }
     .logo-circle {
-        width: 80px; height: 80px;
+        width: 140px; height: 140px;
         border-radius: 50%;
         border: 3px solid #c8a84b;
         overflow: hidden;
@@ -179,7 +179,7 @@ st.markdown("""
         flex-shrink: 0;
     }
     .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
-    .logo-placeholder { width: 80px; height: 80px; border-radius: 50%; border: 2px dashed rgba(200,168,75,0.3); background: rgba(0,20,60,0.4); }
+    .logo-placeholder { width: 140px; height: 140px; border-radius: 50%; border: 2px dashed rgba(200,168,75,0.3); background: rgba(0,20,60,0.4); }
 
     .team-name-display {
         font-family: 'Oswald', sans-serif;
@@ -496,8 +496,15 @@ st.markdown("""
         font-family: 'Rajdhani', sans-serif;
         font-size: 11px;
         letter-spacing: 2px;
-        color: rgba(150,180,255,0.35);
+        color: white;
         text-transform: uppercase;
+    }
+    .rpl-footer a {
+        color: white;
+        text-decoration: underline;
+    }
+    .rpl-footer a:hover {
+        color: #f5d073;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -505,11 +512,11 @@ st.markdown("""
 # --- HEADER ---
 st.markdown("""
     <div class="league-header">
-        <div class="league-title">&#9670; Season 2026 &#9670;</div>
-        <div class="league-name">Riyadh Premier League</div>
+        <div class="league-title">&#9670; Season 18 2026 &#9670;</div>
+        <div class="league-name">Challenger's Cup</div>
         <div class="league-subtitle">Build Your Squad</div>
         
-    <div class="rpl-footer">www.smartstudygrid.com &nbsp;|&nbsp; Created by Amanullah Khan</div>
+    <div class="rpl-footer"><a href="https://www.smartstudygrid.com" target="_blank">www.smartstudygrid.com</a> &nbsp;|&nbsp; Created by Amanullah Khan &nbsp;|&nbsp; +966568959394</div>
 """, unsafe_allow_html=True)
 
 # --- 4. IMAGE PROCESSING ---
@@ -536,8 +543,10 @@ if st.session_state.page == 'home':
         st.markdown('<div class="login-title">⚡ Enter Your Squad</div>', unsafe_allow_html=True)
 
         t = st.selectbox("Select Your Team", [
-            "Kaptan XI", "Pak Eagles", "Riyadh Badshahs",
-            "Riyadh Mavericks", "Riyadh Stallions", "Wazirabad Stars"
+            "Gladiators YB", "KHAN JEE", "KAPTAN 11",
+            "Pak EAGLES", "RCC", "SWAT XI",
+            "Riyadh Stallions", "Riyadh Strikers", "Saudi German",
+            "Punjab XI", "Riyadh Kings", "Team Avengers"
         ])
         p = st.text_input("Password", type="password", placeholder="Enter team password…")
 
@@ -598,7 +607,7 @@ elif st.session_state.page == 'squad':
     view_only = st.session_state.get('view_only', False)
 
     # --- TEAM HEADER BAR ---
-    col_logo, col_title, col_ctrl = st.columns([0.6, 4, 1.4])
+    col_logo, col_title = st.columns([0.6, 5])
 
     with col_logo:
         if team_logo:
@@ -608,23 +617,17 @@ elif st.session_state.page == 'squad':
 
     with col_title:
         st.markdown(f'<div class="team-name-display">{team}</div>', unsafe_allow_html=True)
-        st.markdown('<div class="team-subtitle-tag">Riyadh Premier League &nbsp;·&nbsp; Season 2026</div>', unsafe_allow_html=True)
-
-    with col_ctrl:
+        st.markdown('<div class="team-subtitle-tag">Challenger\'s Cup &nbsp;·&nbsp; Season 18 2026</div>', unsafe_allow_html=True)
         if view_only:
             st.markdown('<div class="view-mode-badge">👁 View Only</div>', unsafe_allow_html=True)
         elif is_locked:
             st.markdown('<div class="locked-banner">🔒 Locked</div>', unsafe_allow_html=True)
-        hcol, ecol = st.columns([1, 2])
-        with hcol:
-            if st.button("🏠", key="home_btn"):
-                st.session_state.page = 'home'
-                st.rerun()
-        with ecol:
-            if view_only:
-                edit_mode = False
-            else:
-                edit_mode = st.toggle("EDIT", value=False, disabled=is_locked)
+
+    # Determine edit_mode (toggle rendered later in the action bar)
+    if view_only:
+        edit_mode = False
+    else:
+        edit_mode = st.toggle("✏️ EDIT MODE", value=False, disabled=is_locked)
 
     # Logo upload in edit mode
     if edit_mode:
@@ -721,17 +724,23 @@ elif st.session_state.page == 'squad':
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ===== SAVE BUTTON =====
-    if edit_mode:
-        st.markdown('<div style="height:16px;"></div>', unsafe_allow_html=True)
-        st.divider()
-        if st.button("💾  Save All Changes", type="primary", use_container_width=True):
-            supabase.table("squads").update({
-                "captain_name": cap_name,
-                "player_list": names,
-                "squad_pics": pics,
-                "cap_pic": cap_pic,
-                "team_logo": team_logo
-            }).eq("team_name", team).execute()
-            st.success("✅ Squad saved successfully!")
+    # ===== ACTION BAR (always visible) =====
+    st.markdown('<div style="height:16px;"></div>', unsafe_allow_html=True)
+    st.divider()
+    action_home, action_spacer, action_save = st.columns([1, 3, 2])
+    with action_home:
+        if st.button("🏠 Home", key="home_btn", use_container_width=True):
+            st.session_state.page = 'home'
             st.rerun()
+    with action_save:
+        if edit_mode:
+            if st.button("💾  Save All Changes", type="primary", use_container_width=True):
+                supabase.table("squads").update({
+                    "captain_name": cap_name,
+                    "player_list": names,
+                    "squad_pics": pics,
+                    "cap_pic": cap_pic,
+                    "team_logo": team_logo
+                }).eq("team_name", team).execute()
+                st.success("✅ Squad saved successfully!")
+                st.rerun()
