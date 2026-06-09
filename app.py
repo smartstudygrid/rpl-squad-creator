@@ -373,11 +373,11 @@ st.markdown("""
     .captain-card-inner::after  { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
 
     .captain-img-area {
-        width: 80%;
+        width: 100%;
         aspect-ratio: unset;
         height: calc(var(--player-row-height, 38vw) * 0.36);
-        min-height: 340px;
-        max-height: 340px;
+        min-height: 300px;
+        max-height: 300px;
         overflow: hidden;
         background: linear-gradient(180deg, rgba(20,40,10,0.8) 0%, rgba(5,15,5,0.9) 100%);
         display: flex; align-items: center; justify-content: center;
