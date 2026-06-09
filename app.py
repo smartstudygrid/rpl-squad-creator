@@ -151,11 +151,14 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(245,208,115,0.4) !important;
         transform: translateY(-1px) !important;
     }
-    .stToggle label p {
+    .stToggle label p,
+    .stToggle label span,
+    .stToggle label div,
+    .stToggle > label {
         font-family: 'Rajdhani', sans-serif !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 13px !important;
+        font-size: 14px !important;
         letter-spacing: 2px !important;
     }
 
@@ -321,12 +324,15 @@ st.markdown("""
     }
     .captain-label {
         font-family: 'Oswald', sans-serif;
-        font-size: 13px;
+        font-size: 11px;
         letter-spacing: 5px;
         color: #c8a84b;
         text-transform: uppercase;
-        margin-bottom: 8px;
         text-align: center;
+        padding: 6px 4px 4px 4px;
+        background: linear-gradient(180deg, rgba(0,30,10,0.9), rgba(5,15,5,0.8));
+        border-bottom: 1px solid rgba(200,168,75,0.25);
+        width: 100%;
     }
     .captain-card-outer {
         position: relative;
@@ -375,6 +381,18 @@ st.markdown("""
         position: relative;
     }
     .captain-img-area img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Captain number badge */
+    .captain-num {
+        position: absolute;
+        top: 36px; left: 7px;
+        font-family: 'Oswald', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(200,168,75,0.85);
+        line-height: 1;
+        z-index: 3;
+    }
 
     /* Captain star badge */
     .captain-star {
@@ -693,7 +711,6 @@ elif st.session_state.page == 'squad':
 
     with cap_col:
         st.markdown('<div class="captain-section">', unsafe_allow_html=True)
-        st.markdown('<div class="captain-label">★ Captain ★</div>', unsafe_allow_html=True)
 
         if cap_pic:
             cap_img_html = f'<img src="data:image/jpeg;base64,{cap_pic}">'
@@ -709,6 +726,8 @@ elif st.session_state.page == 'squad':
             <div class="captain-card-outer">
                 <div class="captain-card-glow"></div>
                 <div class="captain-card-inner">
+                    <div class="captain-label">★ Captain ★</div>
+                    <div class="captain-num">18</div>
                     <div class="captain-star">★</div>
                     <div class="captain-img-area">{cap_img_html}</div>
                     <div class="captain-name-bar">
