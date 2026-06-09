@@ -558,7 +558,7 @@ if st.session_state.page == 'home':
             st.session_state.view_only = True
             st.rerun()
 
-        st.markdown('<hr class="admin-divider">', unsafe_allow_html=True)
+    
         st.markdown('<div class="admin-label">🔒 League Admin</div>', unsafe_allow_html=True)
         admin_pass = st.text_input("Admin Password", type="password", key="admin_p", placeholder="Admin only…")
 
